@@ -28,7 +28,7 @@ class LocalDataSource @Inject constructor() {
             "Benin",
             "Bhutan",
             "Bolivia",
-            "Bosnia and Hezergovina",
+            "Bosnia and Herzegovina",
             "Botswana",
             "Brazil",
             "Brunei",
