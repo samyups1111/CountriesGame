@@ -37,7 +37,7 @@ class GameScreenViewModel @Inject constructor(
             allCountries = getCountriesUseCase.invoke()
 
             val currentLetter = GameScreenUiState.qualifiedLetters.random()
-            val countriesRemaining = allCountries.filter { it.name.common.first() == currentLetter }
+            val countriesRemaining = getRandomCountryByLetter(currentLetter)
 
             gameScreenUiState = GameScreenUiState.RoundInProgress(
                 currentLetter = currentLetter,
@@ -54,13 +54,19 @@ class GameScreenViewModel @Inject constructor(
         updateKeyboard(countryGuessed, state)
 
         state.countriesRemaining.forEach { country ->
-            val countryGuessedFormatted = countryGuessed.trim()
-            val commonNameList = country.name.common.split(',')
-            if (country.name.official.equals(countryGuessedFormatted, ignoreCase = true) ||
-                commonNameList.any {  it.equals(countryGuessedFormatted, ignoreCase = true) }) {
+            if (isCountryCorrectGuess(country, countryGuessed)) {
                 onGuessedCorrectly(country.name.common, state)
             }
         }
+    }
+
+    private fun isCountryCorrectGuess(country: Country, guess: String): Boolean {
+
+        val guessFormatted = guess.trim()
+        val commonNameList = country.name.common.split(',')
+
+        return country.name.official.equals(guessFormatted, ignoreCase = true) ||
+                commonNameList.any {  name -> name.equals(guessFormatted, ignoreCase = true) }
     }
 
     private fun onGuessedCorrectly(countryName: String, prevState: GameScreenUiState.RoundInProgress) {
@@ -68,7 +74,7 @@ class GameScreenViewModel @Inject constructor(
         val numOfCountriesRemaining = prevState.numOfCountriesLeft - 1
 
         if (numOfCountriesRemaining < 1) {
-            setRoundFinishedState(prevState)
+            setRoundFinishedState(prevState) // todo: bug: missing countries showed last remaining country when guess correctly
         } else {
             gameScreenUiState = prevState.copy(
                 countriesRemaining = prevState.countriesRemaining.filter { it.name.common != countryName && it.name.official != countryName},
@@ -227,11 +233,15 @@ class GameScreenViewModel @Inject constructor(
             )
     }
     fun showBottomSheet(countryName: String) {
-        val country = getFilteredCountry(countryName)
+        val country = getCountryByName(countryName)
         showBottomSheet(country)
     }
 
-    private fun getFilteredCountry(name: String): Country {
+    private fun getRandomCountryByLetter(letter: Char): List<Country> {
+        return allCountries.filter { it.name.common.first() == letter }
+    }
+
+    private fun getCountryByName(name: String): Country {
         return allCountries.first { it.name.official == name || it.name.common.split(',').any { commonName -> commonName == name } }
     }
 }

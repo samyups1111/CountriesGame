@@ -1,5 +1,9 @@
 package com.example.countriesgame.ui.gamescreen
 
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -7,7 +11,11 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.core.content.ContextCompat.startActivity
 import com.example.countriesgame.model.CountryMap
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,11 +58,26 @@ fun CountryBottomSheet(
             Text(text = "United Nations Member?: ")
             Text(text = unMember.toString())
         }
-        Row {
-            Text(text = "Search in Google Maps: ")
-            Text(text = maps.googleMaps)
-        }
+        GoogleMapsText(googleMaps = maps.googleMaps)
     }
+}
+
+@Composable
+private fun ColumnScope.GoogleMapsText(googleMaps: String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(googleMaps))
+    val context = LocalContext.current
+    Text(
+        text = "Search in Google Maps: ",
+        fontFamily = FontFamily.Cursive,
+        color = Color.Blue,
+        modifier = Modifier
+            .clickable(
+                enabled = true,
+            ) {
+                startActivity(context, intent, null)
+            }
+            .align(CenterHorizontally)
+    )
 }
 
 //@Preview
