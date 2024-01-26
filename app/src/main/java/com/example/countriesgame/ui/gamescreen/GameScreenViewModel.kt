@@ -36,9 +36,8 @@ class GameScreenViewModel @Inject constructor(
         viewModelScope.launch {
             allCountries = getCountriesUseCase.invoke()
 
-
-            val currentLetter = GameScreenUiState.RoundInProgress().remainingLetters.random()
-            val countriesRemaining = allCountries.filter { it.name.common.first() == currentLetter.uppercaseChar() }
+            val currentLetter = GameScreenUiState.qualifiedLetters.random()
+            val countriesRemaining = allCountries.filter { it.name.common.first() == currentLetter }
 
             gameScreenUiState = GameScreenUiState.RoundInProgress(
                 currentLetter = currentLetter,
@@ -62,10 +61,6 @@ class GameScreenViewModel @Inject constructor(
                 onGuessedCorrectly(country.name.common, state)
             }
         }
-    }
-
-    private fun updateKeyboard(countryName: String, state: GameScreenUiState.RoundInProgress) {
-        gameScreenUiState = state.copy(keyboardText = countryName)
     }
 
     private fun onGuessedCorrectly(countryName: String, state: GameScreenUiState.RoundInProgress) {
@@ -108,27 +103,12 @@ class GameScreenViewModel @Inject constructor(
             player2Name = gameInProgressState.player2Name,
             currentLetter = gameInProgressState.currentLetter,
             missedCountries = gameInProgressState.countriesRemaining,
-            numOfCountriesLeft = gameInProgressState.numOfCountriesLeft,
+            numOfMissedCountries = gameInProgressState.numOfCountriesLeft,
             player1Score = gameInProgressState.player1Score,
             player2Score = gameInProgressState.player2Score,
             isPlayer1Turn = gameInProgressState.isPlayer1Turn,
             remainingLetters = gameInProgressState.remainingLetters,
         )
-    }
-
-    fun loadNextLetter() {
-        gameScreenUiState = gameInProgressState
-    }
-
-    private fun getTurnColor(isPlayer1Turn: Boolean, player: Players): Color {
-        return when (player) {
-            is Players.Player1 -> {
-                if (isPlayer1Turn) Color.Green else Color.White
-            }
-            is Players.Player2 -> {
-                if (isPlayer1Turn) Color.White else Color.Green
-            }
-        }
     }
 
     private fun addCountryToCorrectlyGuessedList(country: String, player: Players): List<String> {
@@ -158,49 +138,69 @@ class GameScreenViewModel @Inject constructor(
 
     fun updateStateOnGiveUp() {
         val prevState = gameScreenUiState as GameScreenUiState.RoundInProgress
-        val missedCountries = prevState.countriesRemaining
+        val missedCountriesPrevRound = prevState.countriesRemaining
 
         if (prevState.remainingLetters.isEmpty()) {
             gameScreenUiState = GameScreenUiState.GameOver
-        } else {
-            val currentLetter = prevState.remainingLetters.random()
-            val countriesRemaining = allCountries.filter { it.name.common.first() == currentLetter }
-            val numOfCountriesLeft = countriesRemaining.size
-            val player1Score = if (prevState.isPlayer1Turn) prevState.player1Score else prevState.player1Score + 1
-            val player2Score = if (prevState.isPlayer1Turn) prevState.player2Score + 1 else prevState.player2Score
-            val remainingLetters = prevState.remainingLetters.filter { it != currentLetter }
-            val isPlayer1Turn = !prevState.isPlayer1Turn
+            return
+        }
+        val currentLetter = prevState.remainingLetters.random()
+        val countriesRemainingThisRound = allCountries.filter { it.name.common.first() == currentLetter }
+        val numOfCountriesLeft = countriesRemainingThisRound.size
+        val player1Score = if (prevState.isPlayer1Turn) prevState.player1Score else prevState.player1Score + 1
+        val player2Score = if (prevState.isPlayer1Turn) prevState.player2Score + 1 else prevState.player2Score
+        val remainingLetters = prevState.remainingLetters.filter { it != currentLetter }
+        val isPlayer1Turn = !prevState.isPlayer1Turn
 
-            gameScreenUiState = GameScreenUiState.RoundFinished(
-                player1Name = prevState.player1Name,
-                player2Name = prevState.player2Name,
-                player1Score = player1Score,
-                player2Score = player2Score,
-                currentLetter = currentLetter,
-                missedCountries = missedCountries,
-                numOfCountriesLeft = numOfCountriesLeft,
-                remainingLetters = remainingLetters,
-                isPlayer1Turn = isPlayer1Turn,
-                result = if (prevState.isPlayer1Turn) "${prevState.player2Name} won that round!" else "${prevState.player1Name} won that round!",
-                resultBackgroundColor = Color.Green,
-            )
+        gameScreenUiState = GameScreenUiState.RoundFinished(
+            player1Name = prevState.player1Name,
+            player2Name = prevState.player2Name,
+            player1Score = player1Score,
+            player2Score = player2Score,
+            currentLetter = currentLetter,
+            missedCountries = missedCountriesPrevRound,
+            numOfMissedCountries = missedCountriesPrevRound.size,
+            remainingLetters = remainingLetters,
+            isPlayer1Turn = isPlayer1Turn,
+            result = if (prevState.isPlayer1Turn) "${prevState.player2Name} won that round!" else "${prevState.player1Name} won that round!",
+            resultBackgroundColor = Color.Green,
+        )
 
-            gameInProgressState = prevState.copy(
-                currentLetter = currentLetter,
-                countriesRemaining = countriesRemaining,
-                numOfCountriesLeft = numOfCountriesLeft,
-                player1Countries = emptyList(),
-                player2Countries = emptyList(),
-                remainingLetters = remainingLetters,
-                showCountriesRemaining = true,
-                player1Score = player1Score,
-                player2Score = player2Score,
-                isPlayer1Turn = isPlayer1Turn,
-                player1TurnColor = getTurnColor(isPlayer1Turn = !prevState.isPlayer1Turn, player = Players.Player1),
-                player2TurnColor = getTurnColor(isPlayer1Turn = !prevState.isPlayer1Turn, player = Players.Player2),
-            )
+        gameInProgressState = prevState.copy(
+            currentLetter = currentLetter,
+            countriesRemaining = countriesRemainingThisRound,
+            numOfCountriesLeft = numOfCountriesLeft,
+            player1Countries = emptyList(),
+            player2Countries = emptyList(),
+            remainingLetters = remainingLetters,
+            showCountriesRemaining = true,
+            player1Score = player1Score,
+            player2Score = player2Score,
+            isPlayer1Turn = isPlayer1Turn,
+            player1TurnColor = getTurnColor(isPlayer1Turn = !prevState.isPlayer1Turn, player = Players.Player1),
+            player2TurnColor = getTurnColor(isPlayer1Turn = !prevState.isPlayer1Turn, player = Players.Player2),
+        )
+    }
+
+    fun startNextRound() {
+        gameScreenUiState = gameInProgressState
+    }
+
+    private fun updateKeyboard(countryName: String, state: GameScreenUiState.RoundInProgress) {
+        gameScreenUiState = state.copy(keyboardText = countryName)
+    }
+
+    private fun getTurnColor(isPlayer1Turn: Boolean, player: Players): Color {
+        return when (player) {
+            is Players.Player1 -> {
+                if (isPlayer1Turn) Color.Green else Color.White
+            }
+            is Players.Player2 -> {
+                if (isPlayer1Turn) Color.White else Color.Green
+            }
         }
     }
+
     fun hideBottomSheet() {
         bottomSheetState = BottomSheetState.Hide
     }

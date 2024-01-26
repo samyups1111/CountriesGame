@@ -2,6 +2,9 @@ package com.example.countriesgame.model
 
 import com.squareup.moshi.Json
 
+/**
+ * **See** [API Data Fields](https://gitlab.com/restcountries/restcountries/-/blob/master/FIELDS.md)
+ */
 data class Country(
     @field:Json(name = "alpha3Code")
     val id: String,

@@ -12,11 +12,11 @@ sealed class GameScreenUiState {
         val result: String = "Result: Draw",
         val currentLetter: Char = ' ',
         val missedCountries: List<Country> = emptyList(),
-        val numOfCountriesLeft: Int = 100,
+        val numOfMissedCountries: Int = 100,
         val player1Score: Int = 0,
         val player2Score: Int = 0,
         val isPlayer1Turn: Boolean = true,
-        val remainingLetters: List<Char> = listOf('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l','m', 'n', 'o', 'p', 'q', 'r','s', 't', 'u', 'v', 'y', 'z'),
+        val remainingLetters: List<Char> = qualifiedLetters,
     ) : GameScreenUiState()
     object GameOver : GameScreenUiState()
     data class RoundInProgress(
@@ -34,6 +34,13 @@ sealed class GameScreenUiState {
         val player2TurnColor: Color = Color.LightGray,
         val isPlayer1Turn: Boolean = true,
         val keyboardText: String = "",
-        val remainingLetters: List<Char> = listOf('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l','m', 'n', 'o', 'p', 'q', 'r','s', 't', 'u', 'v', 'y', 'z')
+        val remainingLetters: List<Char> = qualifiedLetters,
     ) : GameScreenUiState()
+
+    companion object {
+        val qualifiedLetters = listOf(
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+            'L','M', 'N', 'O', 'P', 'Q', 'R','S', 'T', 'U', 'V', 'Y', 'Z'
+        )
+    }
 }

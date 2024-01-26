@@ -40,7 +40,7 @@ fun GameScreen(
         bottomSheetState = vm.bottomSheetState,
         onCountryGuessed = { country: String -> vm.onCountryGuessed(countryGuessed = country) },
         onGiveUp = { vm.updateStateOnGiveUp() },
-        loadNextLetter = { vm.loadNextLetter() },
+        startNextRound = { vm.startNextRound() },
         showBottomSheet = { country: Country ->  vm.showBottomSheet(country) },
         showBottomSheetViaString = { country: String ->  vm.showBottomSheet(country) },
         hideBottomSheet = { vm.hideBottomSheet() },
@@ -55,7 +55,7 @@ fun GameScreenContent(
     bottomSheetState: BottomSheetState = BottomSheetState.Hide,
     onCountryGuessed: (String) -> Unit = {},
     onGiveUp: () -> Unit = {},
-    loadNextLetter: () -> Unit = {},
+    startNextRound: () -> Unit = {},
     showBottomSheet: (Country) -> Unit = {},
     showBottomSheetViaString: (String) -> Unit = {},
     hideBottomSheet: () -> Unit = {},
@@ -129,7 +129,7 @@ fun GameScreenContent(
                 }
                 Spacer(modifier = Modifier.weight(1F))
                 Button(
-                    onClick = loadNextLetter,
+                    onClick = startNextRound,
                 ) {
                     Text(text = "Start Next Round")
                 }
