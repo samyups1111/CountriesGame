@@ -52,13 +52,13 @@ fun GameScreen(
 fun GameScreenContent(
     uiState: GameScreenUiState,
     modifier: Modifier = Modifier,
+    bottomSheetState: BottomSheetState = BottomSheetState.Hide,
     onCountryGuessed: (String) -> Unit = {},
     onGiveUp: () -> Unit = {},
     loadNextLetter: () -> Unit = {},
     showBottomSheet: (Country) -> Unit = {},
     showBottomSheetViaString: (String) -> Unit = {},
     hideBottomSheet: () -> Unit = {},
-    bottomSheetState: BottomSheetState = BottomSheetState.Hide,
     ) {
 
     when (uiState) {
@@ -118,7 +118,7 @@ fun GameScreenContent(
                     ) {
                         items(uiState.missedCountries) { country ->
                             Text(
-                                text = country.name,
+                                text = country.name.common,
                                 modifier = Modifier
                                     .clickable(
                                         enabled = true,
@@ -135,10 +135,15 @@ fun GameScreenContent(
                 }
                 if (bottomSheetState is BottomSheetState.Show) {
                     CountryBottomSheet(
-                        countryName = bottomSheetState.countryName,
+                        officialName = bottomSheetState.countryName.official,
+                        commonName = bottomSheetState.countryName.common,
+                        capital = bottomSheetState.capital.first(),
+                        population = bottomSheetState.population,
+                        region = bottomSheetState.region,
+                        flag = bottomSheetState.flag,
+                        maps = bottomSheetState.maps,
+                        unMember = bottomSheetState.unMember,
                         hideBottomSheet = hideBottomSheet,
-                        imgUrl = bottomSheetState.imgUrl,
-                        description = bottomSheetState.description,
                     )
                 }
             }
@@ -188,10 +193,15 @@ fun GameScreenContent(
                 Button(onClick = onGiveUp) { Text(text = "Give Up") }
                 if (bottomSheetState is BottomSheetState.Show) {
                     CountryBottomSheet(
-                        countryName = bottomSheetState.countryName,
+                        officialName = bottomSheetState.countryName.official,
+                        commonName = bottomSheetState.countryName.common,
+                        capital = bottomSheetState.capital.first(),
+                        population = bottomSheetState.population,
+                        region = bottomSheetState.region,
+                        flag = bottomSheetState.flag,
+                        maps = bottomSheetState.maps,
+                        unMember = bottomSheetState.unMember,
                         hideBottomSheet = hideBottomSheet,
-                        imgUrl = bottomSheetState.imgUrl,
-                        description = bottomSheetState.description,
                     )
                 }
             }
@@ -276,36 +286,36 @@ fun RoundInProgressPreview() {
     }
 }
 
-@Preview
-@Composable
-fun RoundFinishedPreview() {
-    CountriesGameTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            GameScreenContent(
-                uiState = GameScreenUiState.RoundFinished(
-                    player1Name = "Sammy DJ",
-                    result = "Sammy DJ won that round!",
-                    currentLetter = 'c',
-                    missedCountries = listOf(
-                        Country(
-                            name = "Canada",
-                            description = "country description"
-                        ),
-                        Country(
-                            name = "Croatia",
-                            description = "country description"
-                        ),
-                    ),
-                    player1Score = 2,
-                    player2Score = 1,
-                    remainingLetters = listOf('b', 'f', 'p'),
-                    resultBackgroundColor = Color.Green,
-                )
-            )
-        }
-    }
-}
+//@Preview
+//@Composable
+//fun RoundFinishedPreview() {
+//    CountriesGameTheme {
+//        // A surface container using the 'background' color from the theme
+//        Surface(
+//            modifier = Modifier.fillMaxSize(),
+//            color = MaterialTheme.colorScheme.background
+//        ) {
+//            GameScreenContent(
+//                uiState = GameScreenUiState.RoundFinished(
+//                    player1Name = "Sammy DJ",
+//                    result = "Sammy DJ won that round!",
+//                    currentLetter = 'c',
+//                    missedCountries = listOf(
+//                        Country(
+//                            name = "Canada",
+//                            description = "country description"
+//                        ),
+//                        Country(
+//                            name = "Croatia",
+//                            description = "country description"
+//                        ),
+//                    ),
+//                    player1Score = 2,
+//                    player2Score = 1,
+//                    remainingLetters = listOf('b', 'f', 'p'),
+//                    resultBackgroundColor = Color.Green,
+//                )
+//            )
+//        }
+//    }
+//}

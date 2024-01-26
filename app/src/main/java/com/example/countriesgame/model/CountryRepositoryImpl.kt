@@ -1,6 +1,5 @@
 package com.example.countriesgame.model
 
-import android.util.Log
 import com.example.countriesgame.networking.WikiService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -11,19 +10,19 @@ class CountryRepositoryImpl @Inject constructor(
     private val wikiService: WikiService,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CountryRepository {
-    override suspend fun getCountryDescription(query: String): String = withContext(ioDispatcher) {
-        val response = wikiService.getCountryData(query)
+    override suspend fun getCountriesFromServer(): List<Country> = withContext(ioDispatcher) {
+        val response = wikiService.getAllCountries()
 
         if (response.isSuccessful) {
-            val body = response.body()
-            val text = body?.parse?.text?.description
-            log(text ?: "nothing found")
+            val countries = response.body()
 
-            text ?: "No data found"
+            if (countries.isNullOrEmpty()) {
+                emptyList()
+            } else {
+                countries
+            }
         } else {
-            "Network error"
+            emptyList()
         }
     }
 }
-
-fun log(text: String) = Log.d("Sammy", text)

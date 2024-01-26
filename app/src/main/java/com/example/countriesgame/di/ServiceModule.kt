@@ -24,7 +24,7 @@ object ServiceModule {
     fun provideRetrofit(
         moshi: MoshiConverterFactory,
     ): Retrofit = Retrofit.Builder()
-        .baseUrl("https://en.wikipedia.org/")
+        .baseUrl("https://restcountries.com/v3.1/")
         .addConverterFactory(moshi)
         .build()
 

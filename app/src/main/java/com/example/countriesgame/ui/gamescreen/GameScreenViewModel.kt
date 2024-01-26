@@ -25,45 +25,47 @@ class GameScreenViewModel @Inject constructor(
 
     private var gameInProgressState = GameScreenUiState.RoundInProgress()
 
+    private var allCountries: List<Country> = emptyList()
+
     init {
         startGame()
     }
 
     private fun startGame() {
 
-        val currentLetter = GameScreenUiState.RoundInProgress().remainingLetters.random()
-        val countriesRemaining = getCountriesUseCase.invoke(letter = currentLetter)
+        viewModelScope.launch {
+            allCountries = getCountriesUseCase.invoke()
 
-        gameScreenUiState = GameScreenUiState.RoundInProgress(
-            currentLetter = currentLetter,
-            countriesRemaining = countriesRemaining,
-            numOfCountriesLeft = countriesRemaining.size,
-            player1TurnColor = Color.Green,
-        )
+
+            val currentLetter = GameScreenUiState.RoundInProgress().remainingLetters.random()
+            val countriesRemaining = allCountries.filter { it.name.common.first() == currentLetter.uppercaseChar() }
+
+            gameScreenUiState = GameScreenUiState.RoundInProgress(
+                currentLetter = currentLetter,
+                countriesRemaining = countriesRemaining,
+                numOfCountriesLeft = countriesRemaining.size,
+                player1TurnColor = Color.Green,
+            )
+        }
     }
 
     fun onCountryGuessed(countryGuessed: String) {
 
         val state = gameScreenUiState as GameScreenUiState.RoundInProgress
-        updateKeyboard(countryGuessed)
+        updateKeyboard(countryGuessed, state)
 
         state.countriesRemaining.forEach { country ->
             val countryGuessedFormatted = countryGuessed.trim()
-            if (country.name.equals(countryGuessedFormatted, ignoreCase = true) ||
-                (country.altNames?.contains(countryGuessedFormatted) == true)) {
-                onGuessedCorrectly(country.name, state)
+            val commonNameList = country.name.common.split(',')
+            if (country.name.official.equals(countryGuessedFormatted, ignoreCase = true) ||
+                commonNameList.any {  it.equals(countryGuessedFormatted, ignoreCase = true) }) {
+                onGuessedCorrectly(country.name.common, state)
             }
         }
     }
 
-    private fun updateKeyboard(country: String) {
-
-        val state = gameScreenUiState as GameScreenUiState.RoundInProgress
-
-        gameScreenUiState = state.copy(
-            showCountriesRemaining = false,
-            keyboardText = country,
-        )
+    private fun updateKeyboard(countryName: String, state: GameScreenUiState.RoundInProgress) {
+        gameScreenUiState = state.copy(keyboardText = countryName)
     }
 
     private fun onGuessedCorrectly(countryName: String, state: GameScreenUiState.RoundInProgress) {
@@ -71,7 +73,7 @@ class GameScreenViewModel @Inject constructor(
         val numOfCountriesLeft = state.numOfCountriesLeft - 1
 
         gameScreenUiState = state.copy(
-            countriesRemaining = state.countriesRemaining.filter { it.name != countryName },
+            countriesRemaining = state.countriesRemaining.filter { it.name.common != countryName && it.name.official != countryName},
             player1Countries = addCountryToCorrectlyGuessedList(country = countryName, Players.Player1),
             player2Countries = addCountryToCorrectlyGuessedList(country = countryName, Players.Player2),
             keyboardText = "",
@@ -155,23 +157,23 @@ class GameScreenViewModel @Inject constructor(
     }
 
     fun updateStateOnGiveUp() {
-        val state = gameScreenUiState as GameScreenUiState.RoundInProgress
-        val missedCountries = state.countriesRemaining
+        val prevState = gameScreenUiState as GameScreenUiState.RoundInProgress
+        val missedCountries = prevState.countriesRemaining
 
-        if (state.remainingLetters.isEmpty()) {
+        if (prevState.remainingLetters.isEmpty()) {
             gameScreenUiState = GameScreenUiState.GameOver
         } else {
-            val currentLetter = state.remainingLetters.random()
-            val countriesRemaining = getCountriesUseCase.invoke(currentLetter)
+            val currentLetter = prevState.remainingLetters.random()
+            val countriesRemaining = allCountries.filter { it.name.common.first() == currentLetter }
             val numOfCountriesLeft = countriesRemaining.size
-            val player1Score = if (state.isPlayer1Turn) state.player1Score else state.player1Score + 1
-            val player2Score = if (state.isPlayer1Turn) state.player2Score + 1 else state.player2Score
-            val remainingLetters = state.remainingLetters.filter { it != currentLetter }
-            val isPlayer1Turn = !state.isPlayer1Turn
+            val player1Score = if (prevState.isPlayer1Turn) prevState.player1Score else prevState.player1Score + 1
+            val player2Score = if (prevState.isPlayer1Turn) prevState.player2Score + 1 else prevState.player2Score
+            val remainingLetters = prevState.remainingLetters.filter { it != currentLetter }
+            val isPlayer1Turn = !prevState.isPlayer1Turn
 
             gameScreenUiState = GameScreenUiState.RoundFinished(
-                player1Name = state.player1Name,
-                player2Name = state.player2Name,
+                player1Name = prevState.player1Name,
+                player2Name = prevState.player2Name,
                 player1Score = player1Score,
                 player2Score = player2Score,
                 currentLetter = currentLetter,
@@ -179,11 +181,11 @@ class GameScreenViewModel @Inject constructor(
                 numOfCountriesLeft = numOfCountriesLeft,
                 remainingLetters = remainingLetters,
                 isPlayer1Turn = isPlayer1Turn,
-                result = if (isPlayer1Turn) "${state.player2Name} won that round!" else "${state.player1Name} won that round!",
+                result = if (prevState.isPlayer1Turn) "${prevState.player2Name} won that round!" else "${prevState.player1Name} won that round!",
                 resultBackgroundColor = Color.Green,
             )
 
-            gameInProgressState = state.copy(
+            gameInProgressState = prevState.copy(
                 currentLetter = currentLetter,
                 countriesRemaining = countriesRemaining,
                 numOfCountriesLeft = numOfCountriesLeft,
@@ -194,8 +196,8 @@ class GameScreenViewModel @Inject constructor(
                 player1Score = player1Score,
                 player2Score = player2Score,
                 isPlayer1Turn = isPlayer1Turn,
-                player1TurnColor = getTurnColor(isPlayer1Turn = !state.isPlayer1Turn, player = Players.Player1),
-                player2TurnColor = getTurnColor(isPlayer1Turn = !state.isPlayer1Turn, player = Players.Player2),
+                player1TurnColor = getTurnColor(isPlayer1Turn = !prevState.isPlayer1Turn, player = Players.Player1),
+                player2TurnColor = getTurnColor(isPlayer1Turn = !prevState.isPlayer1Turn, player = Players.Player2),
             )
         }
     }
@@ -204,26 +206,20 @@ class GameScreenViewModel @Inject constructor(
     }
 
     fun showBottomSheet(country: Country) {
-        viewModelScope.launch {
-
-            val description = getCountriesUseCase.getDescription(country.name)
-
-            bottomSheetState = BottomSheetState.Show(
-                countryName = country.name,
-                imgUrl = country.imgUrl,
-                description = description
+        bottomSheetState = BottomSheetState.Show(
+            countryName = country.name,
+            capital = country.capital,
+            region = country.region,
+            flag = country.flag,
+            maps = country.maps,
+            population = country.population,
+            unMember = country.unMember,
             )
-        }
     }
-    fun showBottomSheet(country: String) {
-        viewModelScope.launch {
-            val description = getCountriesUseCase.getDescription(country)
+    fun showBottomSheet(countryName: String) {
 
-            bottomSheetState = BottomSheetState.Show(
-                countryName = country,
-                imgUrl = "",
-                description = description
-            )
-        }
+        val country = allCountries.first { it.name.official == countryName || it.name.common.split(',').any { commonName -> commonName == countryName } }
+
+        showBottomSheet(country)
     }
 }
