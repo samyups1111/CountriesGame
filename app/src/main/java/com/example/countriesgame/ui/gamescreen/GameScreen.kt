@@ -1,24 +1,28 @@
 package com.example.countriesgame.ui.gamescreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -51,6 +55,7 @@ fun GameScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreenContent(
     uiState: GameScreenUiState,
@@ -95,7 +100,7 @@ fun GameScreenContent(
                 Row() {
                     ScoreBoard(
                         name = uiState.player1Name,
-                        turnColor = Color.Yellow,
+                        turnColor = Color.LightGray,
                         score = uiState.player1Score,
                         countriesGuessedCorrectly = emptyList(),
                         modifier = Modifier.weight(1F),
@@ -103,7 +108,7 @@ fun GameScreenContent(
                     )
                     ScoreBoard(
                         name = uiState.player2Name,
-                        turnColor = Color.Red,
+                        turnColor = Color.LightGray,
                         score = uiState.player2Score,
                         countriesGuessedCorrectly = emptyList(),
                         modifier = Modifier.weight(1F),
@@ -172,14 +177,19 @@ fun GameScreenContent(
                     text = "${uiState.numOfCountriesLeft} Countries Remaining!",
                     fontSize = 20.sp,
                 )
-                TextField(
-                    value = uiState.keyboardText,
-                    onValueChange = onCountryGuessed,
-                    singleLine = true,
-                    label = { Text(text = "Country") },
+                SearchBar(
+                    query = uiState.keyboardText,
+                    onQueryChange = onCountryGuessed,
+                    onSearch = {},
+                    active = true,
+                    onActiveChange = {},
+                    placeholder = { Text("Country") },
+                    content = {},
                     modifier = Modifier
                         .padding(10.dp)
-                )
+                        .height(75.dp)
+                        .border(color = Color.Blue ,width = 2.dp, shape = CircleShape.copy(all = CornerSize(15.dp)))
+                ) 
                 Row() {
                     ScoreBoard(
                         name = uiState.player1Name,
@@ -203,6 +213,7 @@ fun GameScreenContent(
                     onClick = onGiveUp,
                     modifier = Modifier
                         .padding(5.dp)
+                        .align(CenterHorizontally)
                 ) {
                     Text(text = "Give Up")
                 }
