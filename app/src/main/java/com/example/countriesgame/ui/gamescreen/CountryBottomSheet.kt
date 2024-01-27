@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -39,6 +40,9 @@ fun CountryBottomSheet(
     population: Int,
     unMember: Boolean,
     imgUrl: String,
+    languages: String,
+    currencies: String,
+    borders: String,
     modifier: Modifier = Modifier,
     hideBottomSheet: () -> Unit = {},
 ) {
@@ -49,15 +53,18 @@ fun CountryBottomSheet(
         Text(
             text = flag + officialName,
             fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
             modifier = Modifier
                 .align(CenterHorizontally)
         )
-        Text(
-            text = commonName,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier
-                .align(CenterHorizontally)
-        )
+        if (commonName != officialName) {
+            Text(
+                text = commonName,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier
+                    .align(CenterHorizontally)
+            )
+        }
         GlideImage(
             model = imgUrl,
             contentDescription = "$officialName's Image",
@@ -81,7 +88,20 @@ fun CountryBottomSheet(
             Text(text = "United Nations Member?: ")
             Text(text = unMember.toString())
         }
-        GoogleMapsText(googleMaps = maps.googleMaps, modifier = Modifier.padding(40.dp))
+        Row(modifier = Modifier.padding(10.dp)) {
+            Text(text = "Languages: ")
+            Text(text = languages)
+        }
+        Row(modifier = Modifier.padding(10.dp)) {
+            Text(text = "Borders: ")
+            Text(text = borders)
+        }
+        Row(modifier = Modifier.padding(10.dp)) {
+            Text(text = "Currencies: ")
+            Text(text = currencies)
+        }
+        GoogleMapsText(googleMaps = maps.googleMaps, modifier = Modifier.padding(top = 20.dp, bottom = 10.dp))
+        WikiLink(name = officialName, modifier = Modifier.padding(bottom = 60.dp))
     }
 }
 
@@ -96,6 +116,28 @@ private fun ColumnScope.GoogleMapsText(
         text = "Search in Google Maps: ",
         fontFamily = FontFamily.Cursive,
         color = Color.Blue,
+        modifier = modifier
+            .clickable(
+                enabled = true,
+            ) {
+                startActivity(context, intent, null)
+            }
+            .align(CenterHorizontally)
+    )
+}
+
+@Composable
+private fun ColumnScope.WikiLink(
+    name: String,
+    modifier: Modifier = Modifier,
+) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://en.wikipedia.org/wiki/$name"))
+    val context = LocalContext.current
+
+    Text(
+        text = "Search in Wikipedia: ",
+        fontFamily = FontFamily.Cursive,
+        color = Color.Red,
         modifier = modifier
             .clickable(
                 enabled = true,
@@ -123,6 +165,9 @@ fun CountryBottomSheetPreview() {
                 population = 100000,
                 unMember = true,
                 imgUrl = "https://mainfacts.com/media/images/coats_of_arms/ad.svg",
+                languages = "English, Spanish",
+                borders = "Canada, Mexico",
+                currencies = "USD",
             )
         }
     }

@@ -14,12 +14,14 @@ class CountryRepositoryImpl @Inject constructor(
         val response = wikiService.getAllCountries()
 
         if (response.isSuccessful) {
-            val countries = response.body()
+            val countriesRemote = response.body()
 
-            if (countries.isNullOrEmpty()) {
+            if (countriesRemote.isNullOrEmpty()) {
                 emptyList()
             } else {
-                countries
+                val countries = mutableListOf<Country>()
+                countriesRemote.forEach { countries.add(it.toCountry()) }
+                countries.toList()
             }
         } else {
             emptyList()

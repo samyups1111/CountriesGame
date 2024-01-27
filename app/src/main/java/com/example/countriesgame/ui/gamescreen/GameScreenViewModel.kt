@@ -234,6 +234,9 @@ class GameScreenViewModel @Inject constructor(
             population = country.population,
             unMember = country.unMember,
             imgUrl = country.coatOfArms.png,
+            languages = country.languages.toString(),
+            currencies = country.currencies.toString(),
+            borders = country.borders.toString(),
             )
     }
     fun showBottomSheet(countryName: String) {

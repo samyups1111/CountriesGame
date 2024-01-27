@@ -27,7 +27,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.countriesgame.model.CoatOfArms
 import com.example.countriesgame.model.Country
+import com.example.countriesgame.model.CountryMap
+import com.example.countriesgame.model.CountryName
 import com.example.countriesgame.ui.theme.CountriesGameTheme
 
 @Composable
@@ -71,7 +74,7 @@ fun GameScreenContent(
         is GameScreenUiState.RoundFinished -> {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier,
+                modifier = modifier
             ) {
                 Text(
                     text = uiState.result,
@@ -130,6 +133,8 @@ fun GameScreenContent(
                 Spacer(modifier = Modifier.weight(1F))
                 Button(
                     onClick = startNextRound,
+                    modifier = Modifier
+                        .padding(5.dp)
                 ) {
                     Text(text = "Start Next Round")
                 }
@@ -145,6 +150,9 @@ fun GameScreenContent(
                         unMember = bottomSheetState.unMember,
                         hideBottomSheet = hideBottomSheet,
                         imgUrl = bottomSheetState.imgUrl,
+                        languages = bottomSheetState.languages,
+                        borders = bottomSheetState.borders,
+                        currencies = bottomSheetState.currencies,
                     )
                 }
             }
@@ -191,7 +199,13 @@ fun GameScreenContent(
                     )
                 }
                 Spacer(modifier = Modifier.weight(1F))
-                Button(onClick = onGiveUp) { Text(text = "Give Up") }
+                Button(
+                    onClick = onGiveUp,
+                    modifier = Modifier
+                        .padding(5.dp)
+                ) {
+                    Text(text = "Give Up")
+                }
                 if (bottomSheetState is BottomSheetState.Show) {
                     CountryBottomSheet(
                         officialName = bottomSheetState.countryName.official,
@@ -204,6 +218,9 @@ fun GameScreenContent(
                         unMember = bottomSheetState.unMember,
                         hideBottomSheet = hideBottomSheet,
                         imgUrl = bottomSheetState.imgUrl,
+                        languages = bottomSheetState.languages,
+                        borders = bottomSheetState.borders,
+                        currencies = bottomSheetState.currencies,
                     )
                 }
             }
@@ -288,36 +305,56 @@ fun RoundInProgressPreview() {
     }
 }
 
-//@Preview
-//@Composable
-//fun RoundFinishedPreview() {
-//    CountriesGameTheme {
-//        // A surface container using the 'background' color from the theme
-//        Surface(
-//            modifier = Modifier.fillMaxSize(),
-//            color = MaterialTheme.colorScheme.background
-//        ) {
-//            GameScreenContent(
-//                uiState = GameScreenUiState.RoundFinished(
-//                    player1Name = "Sammy DJ",
-//                    result = "Sammy DJ won that round!",
-//                    currentLetter = 'c',
-//                    missedCountries = listOf(
-//                        Country(
-//                            name = "Canada",
-//                            description = "country description"
-//                        ),
-//                        Country(
-//                            name = "Croatia",
-//                            description = "country description"
-//                        ),
-//                    ),
-//                    player1Score = 2,
-//                    player2Score = 1,
-//                    remainingLetters = listOf('b', 'f', 'p'),
-//                    resultBackgroundColor = Color.Green,
-//                )
-//            )
-//        }
-//    }
-//}
+@Preview
+@Composable
+fun RoundFinishedPreview() {
+    CountriesGameTheme {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            GameScreenContent(
+                uiState = GameScreenUiState.RoundFinished(
+                    player1Name = "Sammy DJ",
+                    result = "Sammy DJ won that round!",
+                    currentLetter = 'c',
+                    missedCountries = listOf(
+                        Country(
+                            id = "",
+                            name = CountryName("Canada", "Canada"),
+                            capital = listOf("capital"),
+                            region = "Americas",
+                            borders = listOf("USA"),
+                            coatOfArms = CoatOfArms("", ""),
+                            currencies = listOf("", "cad"),
+                            flag = "",
+                            maps = CountryMap("", ""),
+                            languages = listOf(""),
+                            population = 100000,
+                            unMember = true,
+                        ),
+                        Country(
+                            id = "",
+                            name = CountryName("Canada", "Canada"),
+                            capital = listOf("capital"),
+                            region = "Americas",
+                            borders = listOf("USA"),
+                            coatOfArms = CoatOfArms("", ""),
+                            currencies = listOf("", "cad"),
+                            flag = "",
+                            maps = CountryMap("", ""),
+                            languages = listOf(""),
+                            population = 100000,
+                            unMember = true,
+                        ),
+                    ),
+                    player1Score = 2,
+                    player2Score = 1,
+                    remainingLetters = listOf('b', 'f', 'p'),
+                    resultBackgroundColor = Color.Green,
+                )
+            )
+        }
+    }
+}

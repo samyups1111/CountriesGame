@@ -15,5 +15,8 @@ sealed class BottomSheetState {
         val population: Int,
         val unMember: Boolean,
         val imgUrl: String,
+        val languages: String,
+        val currencies: String,
+        val borders: String,
     ) : BottomSheetState()
 }
