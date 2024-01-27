@@ -21,7 +21,6 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -39,13 +38,15 @@ import com.example.countriesgame.model.CountryName
 import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
 import com.example.countriesgame.ui.gamescreen.state.CountryGameState
 import com.example.countriesgame.ui.theme.CountriesGameTheme
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
     vm: GameScreenViewModel = hiltViewModel(),
 ) {
-    val gameState = vm.countryGameStateFlow.collectAsState()
+    val gameState = vm.countryGameStateFlow.collectAsStateWithLifecycle()
     val bottomSheetState = vm.bottomSheetState
 
     GameScreenContent(
