@@ -26,32 +26,24 @@ import androidx.core.content.ContextCompat.startActivity
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.countriesgame.model.CountryMap
+import com.example.countriesgame.model.CountryName
 import com.example.countriesgame.ui.theme.CountriesGameTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun CountryBottomSheet(
-    officialName: String,
-    commonName: String,
-    capital: String,
-    region: String,
-    flag: String,
-    maps: CountryMap,
-    population: Int,
-    unMember: Boolean,
-    imgUrl: String,
-    languages: String,
-    currencies: String,
-    borders: String,
+    state: BottomSheetState.Show,
+    hideBottomSheet: () -> Unit,
     modifier: Modifier = Modifier,
-    hideBottomSheet: () -> Unit = {},
 ) {
+    val officialName = state.countryName.official
+    val commonName = state.countryName.common
     ModalBottomSheet(
         onDismissRequest = hideBottomSheet,
         modifier = modifier
     ) {
         Text(
-            text = flag + officialName,
+            text = state.flag + officialName,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
             modifier = Modifier
@@ -66,41 +58,41 @@ fun CountryBottomSheet(
             )
         }
         GlideImage(
-            model = imgUrl,
-            contentDescription = "$officialName's Image",
+            model = state.imgUrl,
+            contentDescription = "${officialName}'s Image",
             modifier = Modifier
                 .size(300.dp)
                 .align(CenterHorizontally)
         )
         Row(modifier = Modifier.padding(10.dp)) {
             Text(text = "Capital: ")
-            Text(text = capital)
+            Text(text = state.capital.toString())
         }
         Row(modifier = Modifier.padding(10.dp)) {
             Text(text = "Located in: ")
-            Text(text = region)
+            Text(text = state.region)
         }
         Row(modifier = Modifier.padding(10.dp)) {
             Text(text = "Population: ")
-            Text(text = population.toString())
+            Text(text = state.population.toString())
         }
         Row(modifier = Modifier.padding(10.dp)) {
             Text(text = "United Nations Member?: ")
-            Text(text = unMember.toString())
+            Text(text = state.unMember.toString())
         }
         Row(modifier = Modifier.padding(10.dp)) {
             Text(text = "Languages: ")
-            Text(text = languages)
+            Text(text = state.languages)
         }
         Row(modifier = Modifier.padding(10.dp)) {
             Text(text = "Borders: ")
-            Text(text = borders)
+            Text(text = state.borders)
         }
         Row(modifier = Modifier.padding(10.dp)) {
             Text(text = "Currencies: ")
-            Text(text = currencies)
+            Text(text = state.currencies)
         }
-        GoogleMapsText(googleMaps = maps.googleMaps, modifier = Modifier.padding(top = 20.dp, bottom = 10.dp))
+        GoogleMapsText(googleMaps = state.maps.googleMaps, modifier = Modifier.padding(top = 20.dp, bottom = 10.dp))
         WikiLink(name = officialName, modifier = Modifier.padding(bottom = 60.dp))
     }
 }
@@ -156,18 +148,20 @@ fun CountryBottomSheetPreview() {
             color = MaterialTheme.colorScheme.background,
         ) {
             CountryBottomSheet(
-                officialName = "United States",
-                commonName = "USA",
-                capital = "DC",
-                region = "Americas",
-                flag = "",
-                maps = CountryMap("", ""),
-                population = 100000,
-                unMember = true,
-                imgUrl = "https://mainfacts.com/media/images/coats_of_arms/ad.svg",
-                languages = "English, Spanish",
-                borders = "Canada, Mexico",
-                currencies = "USD",
+                state = BottomSheetState.Show(
+                    countryName = CountryName("United States", "USA"),
+                    capital = listOf("DC"),
+                    region = "Americas",
+                    flag = "",
+                    maps = CountryMap("", ""),
+                    population = 100000,
+                    unMember = true,
+                    imgUrl = "https://mainfacts.com/media/images/coats_of_arms/ad.svg",
+                    languages = "English, Spanish",
+                    borders = "Canada, Mexico",
+                    currencies = "USD",
+                ),
+                hideBottomSheet = {},
             )
         }
     }

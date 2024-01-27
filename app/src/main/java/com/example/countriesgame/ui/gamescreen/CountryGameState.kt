@@ -3,8 +3,8 @@ package com.example.countriesgame.ui.gamescreen
 import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
 
-sealed class GameScreenUiState {
-    object Loading : GameScreenUiState()
+sealed class CountryGameState {
+    object Loading : CountryGameState()
     data class RoundFinished(
         val player1Name: String = "Player 1",
         val player2Name: String = "Player 2",
@@ -17,8 +17,8 @@ sealed class GameScreenUiState {
         val player2Score: Int = 0,
         val isPlayer1Turn: Boolean = true,
         val remainingLetters: List<Char> = qualifiedLetters,
-    ) : GameScreenUiState()
-    object GameOver : GameScreenUiState()
+    ) : CountryGameState()
+    object CountryGameOver : CountryGameState()
     data class RoundInProgress(
         val player1Name: String = "Player 1",
         val player2Name: String = "Player 2",
@@ -35,7 +35,7 @@ sealed class GameScreenUiState {
         val isPlayer1Turn: Boolean = true,
         val keyboardText: String = "",
         val remainingLetters: List<Char> = qualifiedLetters,
-    ) : GameScreenUiState()
+    ) : CountryGameState()
 
     companion object {
         val qualifiedLetters = listOf(

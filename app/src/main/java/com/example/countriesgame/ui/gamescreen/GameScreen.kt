@@ -21,6 +21,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -42,47 +43,52 @@ fun GameScreen(
     modifier: Modifier = Modifier,
     vm: GameScreenViewModel = hiltViewModel(),
 ) {
+    val gameState = vm.countryGameStateFlow.collectAsState()
+    val bottomSheetState = vm.bottomSheetState
+
     GameScreenContent(
-        uiState = vm.gameScreenUiState,
-        bottomSheetState = vm.bottomSheetState,
-        onCountryGuessed = { country: String -> vm.onCountryGuessed(countryGuessed = country) },
-        onGiveUp = { vm.updateStateOnGiveUp() },
+        countryGameState = gameState.value,
+        onCountryGuessed = { country: String -> vm.onPlayerAnswered(countryGuessed = country) },
+        onGiveUp = { vm.onPlayerGaveUp() },
         startNextRound = { vm.startNextRound() },
         showBottomSheet = { country: Country ->  vm.showBottomSheet(country) },
         showBottomSheetViaString = { country: String ->  vm.showBottomSheet(country) },
-        hideBottomSheet = { vm.hideBottomSheet() },
         modifier = modifier,
     )
+    if (bottomSheetState is BottomSheetState.Show) {
+        CountryBottomSheet(
+            state = bottomSheetState,
+            hideBottomSheet = { vm.hideBottomSheet() },
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GameScreenContent(
-    uiState: GameScreenUiState,
+    countryGameState: CountryGameState,
     modifier: Modifier = Modifier,
-    bottomSheetState: BottomSheetState = BottomSheetState.Hide,
     onCountryGuessed: (String) -> Unit = {},
     onGiveUp: () -> Unit = {},
     startNextRound: () -> Unit = {},
     showBottomSheet: (Country) -> Unit = {},
     showBottomSheetViaString: (String) -> Unit = {},
-    hideBottomSheet: () -> Unit = {},
     ) {
 
-    when (uiState) {
-        is GameScreenUiState.GameOver -> {
+    when (countryGameState) {
+        is CountryGameState.CountryGameOver -> {
             Text(text = "Game Over. Thank you for playing.")
         }
-        is GameScreenUiState.Loading -> {
+        is CountryGameState.Loading -> {
             Text(text = "Loading...")
         }
-        is GameScreenUiState.RoundFinished -> {
+        is CountryGameState.RoundFinished -> {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = CenterHorizontally,
                 modifier = modifier
             ) {
                 Text(
-                    text = uiState.result,
+                    text = countryGameState.result,
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
@@ -92,31 +98,31 @@ fun GameScreenContent(
                             shape = CircleShape.copy(all = CornerSize(15.dp))
                         )
                         .background(
-                            color = uiState.resultBackgroundColor,
+                            color = countryGameState.resultBackgroundColor,
                             shape = CircleShape.copy(all = CornerSize(15.dp))
                         )
                         .padding(15.dp)
                 )
                 Row() {
                     ScoreBoard(
-                        name = uiState.player1Name,
+                        name = countryGameState.player1Name,
                         turnColor = Color.LightGray,
-                        score = uiState.player1Score,
+                        score = countryGameState.player1Score,
                         countriesGuessedCorrectly = emptyList(),
                         modifier = Modifier.weight(1F),
                         showBottomSheet = showBottomSheetViaString,
                     )
                     ScoreBoard(
-                        name = uiState.player2Name,
+                        name = countryGameState.player2Name,
                         turnColor = Color.LightGray,
-                        score = uiState.player2Score,
+                        score = countryGameState.player2Score,
                         countriesGuessedCorrectly = emptyList(),
                         modifier = Modifier.weight(1F),
                         showBottomSheet = showBottomSheetViaString,
                     )
                 }
 
-                if (uiState.missedCountries.isNotEmpty()) {
+                if (countryGameState.missedCountries.isNotEmpty()) {
                     Text(
                         text = "Missed Countries",
                         fontWeight = FontWeight.Bold,
@@ -124,7 +130,7 @@ fun GameScreenContent(
                     LazyColumn(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        items(uiState.missedCountries) { country ->
+                        items(countryGameState.missedCountries) { country ->
                             Text(
                                 text = country.name.common,
                                 modifier = Modifier
@@ -143,26 +149,10 @@ fun GameScreenContent(
                 ) {
                     Text(text = "Start Next Round")
                 }
-                if (bottomSheetState is BottomSheetState.Show) {
-                    CountryBottomSheet(
-                        officialName = bottomSheetState.countryName.official,
-                        commonName = bottomSheetState.countryName.common,
-                        capital = bottomSheetState.capital.first(),
-                        population = bottomSheetState.population,
-                        region = bottomSheetState.region,
-                        flag = bottomSheetState.flag,
-                        maps = bottomSheetState.maps,
-                        unMember = bottomSheetState.unMember,
-                        hideBottomSheet = hideBottomSheet,
-                        imgUrl = bottomSheetState.imgUrl,
-                        languages = bottomSheetState.languages,
-                        borders = bottomSheetState.borders,
-                        currencies = bottomSheetState.currencies,
-                    )
-                }
+
             }
         }
-        is GameScreenUiState.RoundInProgress -> {
+        is CountryGameState.RoundInProgress -> {
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -170,15 +160,15 @@ fun GameScreenContent(
                     .padding(5.dp)
             ) {
                 Text(
-                    text = "The current letter is: ${uiState.currentLetter}",
+                    text = "The current letter is: ${countryGameState.currentLetter}",
                     fontSize = 30.sp,
                 )
                 Text(
-                    text = "${uiState.numOfCountriesLeft} Countries Remaining!",
+                    text = "${countryGameState.numOfCountriesLeft} Countries Remaining!",
                     fontSize = 20.sp,
                 )
                 SearchBar(
-                    query = uiState.keyboardText,
+                    query = countryGameState.keyboardText,
                     onQueryChange = onCountryGuessed,
                     onSearch = {},
                     active = true,
@@ -188,22 +178,26 @@ fun GameScreenContent(
                     modifier = Modifier
                         .padding(10.dp)
                         .height(75.dp)
-                        .border(color = Color.Blue ,width = 2.dp, shape = CircleShape.copy(all = CornerSize(15.dp)))
+                        .border(
+                            color = Color.Blue,
+                            width = 2.dp,
+                            shape = CircleShape.copy(all = CornerSize(15.dp))
+                        )
                 ) 
                 Row() {
                     ScoreBoard(
-                        name = uiState.player1Name,
-                        turnColor = uiState.player1TurnColor,
-                        score = uiState.player1Score,
-                        countriesGuessedCorrectly = uiState.player1Countries,
+                        name = countryGameState.player1Name,
+                        turnColor = countryGameState.player1TurnColor,
+                        score = countryGameState.player1Score,
+                        countriesGuessedCorrectly = countryGameState.player1Countries,
                         modifier = Modifier.weight(1F),
                         showBottomSheet = showBottomSheetViaString
                     )
                     ScoreBoard(
-                        name = uiState.player2Name,
-                        turnColor = uiState.player2TurnColor,
-                        score = uiState.player2Score,
-                        countriesGuessedCorrectly = uiState.player2Countries,
+                        name = countryGameState.player2Name,
+                        turnColor = countryGameState.player2TurnColor,
+                        score = countryGameState.player2Score,
+                        countriesGuessedCorrectly = countryGameState.player2Countries,
                         modifier = Modifier.weight(1F),
                         showBottomSheet = showBottomSheetViaString,
                     )
@@ -216,23 +210,6 @@ fun GameScreenContent(
                         .align(CenterHorizontally)
                 ) {
                     Text(text = "Give Up")
-                }
-                if (bottomSheetState is BottomSheetState.Show) {
-                    CountryBottomSheet(
-                        officialName = bottomSheetState.countryName.official,
-                        commonName = bottomSheetState.countryName.common,
-                        capital = bottomSheetState.capital.first(),
-                        population = bottomSheetState.population,
-                        region = bottomSheetState.region,
-                        flag = bottomSheetState.flag,
-                        maps = bottomSheetState.maps,
-                        unMember = bottomSheetState.unMember,
-                        hideBottomSheet = hideBottomSheet,
-                        imgUrl = bottomSheetState.imgUrl,
-                        languages = bottomSheetState.languages,
-                        borders = bottomSheetState.borders,
-                        currencies = bottomSheetState.currencies,
-                    )
                 }
             }
         }
@@ -301,7 +278,7 @@ fun RoundInProgressPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             GameScreenContent(
-                uiState = GameScreenUiState.RoundInProgress(
+                countryGameState = CountryGameState.RoundInProgress(
                     player1Name = "Sammy DJ",
                     currentLetter = 's',
                     numOfCountriesLeft = 22,
@@ -326,7 +303,7 @@ fun RoundFinishedPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             GameScreenContent(
-                uiState = GameScreenUiState.RoundFinished(
+                countryGameState = CountryGameState.RoundFinished(
                     player1Name = "Sammy DJ",
                     result = "Sammy DJ won that round!",
                     currentLetter = 'c',
