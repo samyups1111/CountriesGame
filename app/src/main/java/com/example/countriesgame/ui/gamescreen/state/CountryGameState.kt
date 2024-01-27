@@ -1,4 +1,4 @@
-package com.example.countriesgame.ui.gamescreen
+package com.example.countriesgame.ui.gamescreen.state
 
 import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
@@ -33,7 +33,7 @@ sealed class CountryGameState {
         val player1TurnColor: Color = Color.LightGray,
         val player2TurnColor: Color = Color.LightGray,
         val isPlayer1Turn: Boolean = true,
-        val keyboardText: String = "",
+        val searchBarText: String = "",
         val remainingLetters: List<Char> = qualifiedLetters,
     ) : CountryGameState()
 

@@ -1,5 +1,7 @@
-package com.example.countriesgame.model
+package com.example.countriesgame.model.repository
 
+import com.example.countriesgame.model.Country
+import com.example.countriesgame.model.toCountry
 import com.example.countriesgame.networking.WikiService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

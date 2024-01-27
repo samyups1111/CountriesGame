@@ -1,8 +1,10 @@
-package com.example.countriesgame.ui.gamescreen
+package com.example.countriesgame.server
 
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
+import com.example.countriesgame.ui.gamescreen.state.CountryGameState
+import com.example.countriesgame.model.Players
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
@@ -20,7 +22,7 @@ class CountryGameServer @Inject constructor() {
 
     fun startGame() {
         val currentLetter = CountryGameState.qualifiedLetters.random()
-        val countriesRemaining = getCountriesThatStartByRandomLetter(currentLetter)
+        val countriesRemaining = getCountriesByRandomLetter(currentLetter)
 
         val startState = CountryGameState.RoundInProgress(
             currentLetter = currentLetter,
@@ -34,7 +36,7 @@ class CountryGameServer @Inject constructor() {
     fun onPlayerAnswered(countryGuessed: String) {
 
         val prevState = countryGameState.value as CountryGameState.RoundInProgress
-        updateKeyboard(countryGuessed, prevState)
+        updateSearchBar(countryGuessed, prevState)
 
         prevState.countriesRemaining.forEach { country ->
             if (isCountryCorrectGuess(country, countryGuessed)) {
@@ -61,16 +63,20 @@ class CountryGameServer @Inject constructor() {
         } else {
             countryGameState.value = prevState.copy(
                 countriesRemaining = prevState.countriesRemaining.filter { it.name.common != countryName && it.name.official != countryName},
-                player1Countries = addCountryToCorrectlyGuessedList(country = countryName, Players.Player1),
-                player2Countries = addCountryToCorrectlyGuessedList(country = countryName, Players.Player2),
-                keyboardText = "",
+                player1Countries = addCountryToCorrectlyGuessedList(country = countryName,
+                    Players.Player1
+                ),
+                player2Countries = addCountryToCorrectlyGuessedList(country = countryName,
+                    Players.Player2
+                ),
+                searchBarText = "",
                 numOfCountriesLeft = numOfCountriesRemaining,
                 isPlayer1Turn = !prevState.isPlayer1Turn,
-                player1TurnColor = getTurnColor(
+                player1TurnColor = getScoreBoardColor(
                     isPlayer1Turn = !prevState.isPlayer1Turn,
                     player = Players.Player1,
                 ),
-                player2TurnColor = getTurnColor(
+                player2TurnColor = getScoreBoardColor(
                     isPlayer1Turn = !prevState.isPlayer1Turn,
                     player = Players.Player2,
                 ),
@@ -144,14 +150,14 @@ class CountryGameServer @Inject constructor() {
             player1Countries = emptyList(),
             player2Countries = emptyList(),
             currentLetter = currentLetter,
-            keyboardText = "",
+            searchBarText = "",
             numOfCountriesLeft = numOfCountriesRemaining,
             isPlayer1Turn = isPlayer1Turn,
-            player1TurnColor = getTurnColor(
+            player1TurnColor = getScoreBoardColor(
                 isPlayer1Turn = isPlayer1Turn,
                 player = Players.Player1,
             ),
-            player2TurnColor = getTurnColor(
+            player2TurnColor = getScoreBoardColor(
                 isPlayer1Turn = isPlayer1Turn,
                 player = Players.Player2,
             ),
@@ -188,7 +194,7 @@ class CountryGameServer @Inject constructor() {
         countryGameState.value = gameInProgressState
     }
 
-    private fun getTurnColor(isPlayer1Turn: Boolean, player: Players): Color {
+    private fun getScoreBoardColor(isPlayer1Turn: Boolean, player: Players): Color {
         return when (player) {
             is Players.Player1 -> {
                 if (isPlayer1Turn) Color.Green else Color.LightGray
@@ -199,11 +205,11 @@ class CountryGameServer @Inject constructor() {
         }
     }
 
-    private fun updateKeyboard(countryName: String, state: CountryGameState.RoundInProgress) {
-        countryGameState.value = state.copy(keyboardText = countryName)
+    private fun updateSearchBar(countryName: String, state: CountryGameState.RoundInProgress) {
+        countryGameState.value = state.copy(searchBarText = countryName)
     }
 
-    private fun getCountriesThatStartByRandomLetter(letter: Char): List<Country> {
+    private fun getCountriesByRandomLetter(letter: Char): List<Country> {
         return allCountries.filter { it.name.common.first() == letter }
     }
 }

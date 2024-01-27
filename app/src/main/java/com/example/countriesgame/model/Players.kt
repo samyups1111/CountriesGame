@@ -1,4 +1,4 @@
-package com.example.countriesgame.ui.gamescreen
+package com.example.countriesgame.model
 
 sealed class Players {
     object Player1 : Players()

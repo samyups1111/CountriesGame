@@ -27,6 +27,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.countriesgame.model.CountryMap
 import com.example.countriesgame.model.CountryName
+import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
 import com.example.countriesgame.ui.theme.CountriesGameTheme
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)

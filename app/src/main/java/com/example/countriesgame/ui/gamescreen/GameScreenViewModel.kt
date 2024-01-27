@@ -5,8 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.countriesgame.server.CountryGameServer
 import com.example.countriesgame.model.Country
-import com.example.countriesgame.model.GetCountriesUseCase
+import com.example.countriesgame.model.usecase.GetCountriesUseCase
+import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
+import com.example.countriesgame.ui.gamescreen.state.CountryGameState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

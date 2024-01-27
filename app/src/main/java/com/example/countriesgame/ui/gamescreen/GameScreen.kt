@@ -36,6 +36,8 @@ import com.example.countriesgame.model.CoatOfArms
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.CountryMap
 import com.example.countriesgame.model.CountryName
+import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
+import com.example.countriesgame.ui.gamescreen.state.CountryGameState
 import com.example.countriesgame.ui.theme.CountriesGameTheme
 
 @Composable
@@ -168,7 +170,7 @@ fun GameScreenContent(
                     fontSize = 20.sp,
                 )
                 SearchBar(
-                    query = countryGameState.keyboardText,
+                    query = countryGameState.searchBarText,
                     onQueryChange = onCountryGuessed,
                     onSearch = {},
                     active = true,
