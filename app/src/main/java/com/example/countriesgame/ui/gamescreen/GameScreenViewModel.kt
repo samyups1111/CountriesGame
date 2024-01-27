@@ -108,10 +108,10 @@ class GameScreenViewModel @Inject constructor(
             return
         }
 
-        val player1Score = if (awardPoint && prevState.isPlayer1Turn) prevState.player1Score else prevState.player1Score
+        val player1Score = if (awardPoint && !prevState.isPlayer1Turn) prevState.player1Score + 1 else prevState.player1Score
         val player2Score = if (awardPoint && prevState.isPlayer1Turn) prevState.player2Score + 1 else prevState.player2Score
         val currentLetter = prevState.remainingLetters.random()
-        val missedCountriesPrevRound = prevState.countriesRemaining
+        val missedCountriesPrevRound = if (awardPoint) prevState.countriesRemaining else emptyList()
         val countriesRemainingThisRound = allCountries.filter { it.name.common.first() == currentLetter }
         val numOfCountriesRemaining = countriesRemainingThisRound.size
         val remainingLetters = prevState.remainingLetters.filter { it != currentLetter }
@@ -140,6 +140,7 @@ class GameScreenViewModel @Inject constructor(
             player1Score = player1Score,
             player2Score = player2Score,
             currentLetter = currentLetter,
+            remainingLetters = remainingLetters,
         )
     }
 
@@ -151,6 +152,7 @@ class GameScreenViewModel @Inject constructor(
         player1Score: Int,
         player2Score: Int,
         currentLetter: Char,
+        remainingLetters: List<Char>,
     ) {
         gameInProgressState = prevState.copy(
             countriesRemaining = countriesRemaining,
@@ -170,6 +172,7 @@ class GameScreenViewModel @Inject constructor(
                 isPlayer1Turn = isPlayer1Turn,
                 player = Players.Player2,
             ),
+            remainingLetters = remainingLetters,
         )
     }
 
@@ -230,6 +233,7 @@ class GameScreenViewModel @Inject constructor(
             maps = country.maps,
             population = country.population,
             unMember = country.unMember,
+            imgUrl = country.coatOfArms.png,
             )
     }
     fun showBottomSheet(countryName: String) {

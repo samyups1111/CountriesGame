@@ -15,6 +15,7 @@ data class Country(
     val maps: CountryMap,
     val population: Int,
     val unMember: Boolean,
+    val coatOfArms: CoatOfArms,
 )
 
 data class CountryName(
@@ -25,4 +26,9 @@ data class CountryName(
 data class CountryMap(
     val googleMaps: String,
     val openStreetMaps: String,
+)
+
+data class CoatOfArms(
+    val svg: String,
+    val png: String,
 )

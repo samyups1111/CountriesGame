@@ -144,6 +144,7 @@ fun GameScreenContent(
                         maps = bottomSheetState.maps,
                         unMember = bottomSheetState.unMember,
                         hideBottomSheet = hideBottomSheet,
+                        imgUrl = bottomSheetState.imgUrl,
                     )
                 }
             }
@@ -202,6 +203,7 @@ fun GameScreenContent(
                         maps = bottomSheetState.maps,
                         unMember = bottomSheetState.unMember,
                         hideBottomSheet = hideBottomSheet,
+                        imgUrl = bottomSheetState.imgUrl,
                     )
                 }
             }

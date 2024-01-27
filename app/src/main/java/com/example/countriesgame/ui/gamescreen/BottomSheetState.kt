@@ -14,5 +14,6 @@ sealed class BottomSheetState {
         val maps: CountryMap,
         val population: Int,
         val unMember: Boolean,
+        val imgUrl: String,
     ) : BottomSheetState()
 }

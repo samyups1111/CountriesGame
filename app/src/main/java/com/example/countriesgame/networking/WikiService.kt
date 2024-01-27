@@ -13,6 +13,6 @@ interface WikiService {
 
     @GET("independent?")
     suspend fun getAllCountries(
-        @Query("fields") fields: String = "capital,region,flag,maps,name,population,unMember,alpha3Code"
+        @Query("fields") fields: String = "capital,region,flag,maps,name,population,unMember,alpha3Code,coatOfArms"
     ): Response<List<Country>>
 }
