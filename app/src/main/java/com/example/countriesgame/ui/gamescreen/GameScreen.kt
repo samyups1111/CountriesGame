@@ -67,7 +67,7 @@ fun GameScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GameScreenContent(
+private fun GameScreenContent(
     countryGameState: CountryGameState,
     modifier: Modifier = Modifier,
     onCountryGuessed: (String) -> Unit = {},
