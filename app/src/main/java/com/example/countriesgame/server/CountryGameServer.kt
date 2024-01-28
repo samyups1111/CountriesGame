@@ -5,16 +5,15 @@ import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.ui.gamescreen.state.CountryGameState
 import com.example.countriesgame.model.Players
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.countriesgame.model.RoundResult
 import javax.inject.Inject
 
-class CountryGameServer @Inject constructor() {
+class CountryGameServer @Inject constructor(
+    private val gameStateManager: GameStateManager,
+) {
 
     private var allCountries: List<Country> = emptyList()
-    var countryGameState : MutableStateFlow<CountryGameState> = MutableStateFlow(CountryGameState.Loading)
-        private set
-
-    private var gameInProgressState = CountryGameState.RoundInProgress()
+    var countryGameState = gameStateManager.countryGameState
 
     fun loadCountries(countries: List<Country>) {
         allCountries = countries
@@ -22,30 +21,33 @@ class CountryGameServer @Inject constructor() {
 
     fun startGame() {
         val currentLetter = CountryGameState.qualifiedLetters.random()
-        val countriesRemaining = getCountriesByRandomLetter(currentLetter)
+        val countriesRemaining = getCountriesByLetter(currentLetter)
+        val remainingLetters = getLettersRemaining(currentLetter, CountryGameState.qualifiedLetters)
 
-        val startState = CountryGameState.RoundInProgress(
-            currentLetter = currentLetter,
+        gameStateManager.setStartState(
+            startingLetter = currentLetter,
             countriesRemaining = countriesRemaining,
-            numOfCountriesLeft = countriesRemaining.size,
-            player1TurnColor = Color.Green,
+            remainingLetters = remainingLetters,
         )
-        countryGameState.value = startState
     }
 
-    fun onPlayerAnswered(countryGuessed: String) {
+    private fun getLettersRemaining(currentLetter: Char, letters: List<Char>): List<Char> {
+        return letters.filter { it != currentLetter }
+    }
 
-        val prevState = countryGameState.value as CountryGameState.RoundInProgress
-        updateSearchBar(countryGuessed, prevState)
+    fun onAnswerSubmitted(countryGuessed: String) {
 
-        prevState.countriesRemaining.forEach { country ->
-            if (isCountryCorrectGuess(country, countryGuessed)) {
-                onGuessedCorrectly(country.name.common, prevState)
+        gameStateManager.savePreviousRoundInProgressState()
+        gameStateManager.updateSearchBarState(countryGuessed)
+
+        gameStateManager.prevState.countriesRemaining.forEach { country ->
+            if (isAnswerCorrect(country, countryGuessed)) {
+                onCorrectAnswerSubmitted(country.name.common)
             }
         }
     }
 
-    private fun isCountryCorrectGuess(country: Country, guess: String): Boolean {
+    private fun isAnswerCorrect(country: Country, guess: String): Boolean {
 
         val guessFormatted = guess.trim()
         val commonNameList = country.name.common.split(',')
@@ -54,120 +56,103 @@ class CountryGameServer @Inject constructor() {
                 commonNameList.any {  name -> name.equals(guessFormatted, ignoreCase = true) }
     }
 
-    private fun onGuessedCorrectly(countryName: String, prevState: CountryGameState.RoundInProgress) {
+    private fun onCorrectAnswerSubmitted(countryName: String) {
 
-        val numOfCountriesRemaining = prevState.numOfCountriesLeft - 1
+        val numOfCountriesRemaining = gameStateManager.prevState.numOfCountriesLeft - 1
 
         if (numOfCountriesRemaining < 1) {
-            setRoundFinishedState(prevState) // todo: bug: missing countries showed last remaining country when guess correctly
+            setRoundFinishedState() // todo: bug: missing countries showed last remaining country when guess correctly
         } else {
-            countryGameState.value = prevState.copy(
-                countriesRemaining = prevState.countriesRemaining.filter { it.name.common != countryName && it.name.official != countryName},
-                player1Countries = addCountryToCorrectlyGuessedList(country = countryName,
-                    Players.Player1
-                ),
-                player2Countries = addCountryToCorrectlyGuessedList(country = countryName,
-                    Players.Player2
-                ),
-                searchBarText = "",
-                numOfCountriesLeft = numOfCountriesRemaining,
-                isPlayer1Turn = !prevState.isPlayer1Turn,
-                player1TurnColor = getScoreBoardColor(
-                    isPlayer1Turn = !prevState.isPlayer1Turn,
-                    player = Players.Player1,
-                ),
-                player2TurnColor = getScoreBoardColor(
-                    isPlayer1Turn = !prevState.isPlayer1Turn,
-                    player = Players.Player2,
-                ),
+            val countriesRemaining = gameStateManager.prevState.countriesRemaining.filter { it.name.common != countryName && it.name.official != countryName}
+            val player1Countries = addCountryToCorrectlyGuessedList(
+                country = countryName,
+                player = Players.Player1,
+            )
+            val player2Countries = addCountryToCorrectlyGuessedList(
+                country = countryName,
+                Players.Player2,
+            )
+            val player1TurnColor = getScoreBoardColor(
+                isPlayer1Turn = !gameStateManager.prevState.isPlayer1Turn,
+                player = Players.Player1,
+            )
+            val player2TurnColor = getScoreBoardColor(
+                isPlayer1Turn = !gameStateManager.prevState.isPlayer1Turn,
+                player = Players.Player2,
+            )
+            gameStateManager.continueRoundState(
+                countriesRemaining = countriesRemaining,
+                player1Countries = player1Countries,
+                player2Countries = player2Countries,
+                numOfCountriesRemaining = numOfCountriesRemaining,
+                player1TurnColor = player1TurnColor,
+                player2TurnColor = player2TurnColor,
             )
         }
     }
 
     fun updateStateOnGiveUp() {
-        val prevState = countryGameState.value as CountryGameState.RoundInProgress
+        gameStateManager.savePreviousRoundInProgressState()
 
-        setRoundFinishedState(prevState, awardPoint = true)
+        val roundResult = if (gameStateManager.prevState.isPlayer1Turn) RoundResult.Player2Won else RoundResult.Player1Won
+
+        setRoundFinishedState(roundResult = roundResult)
     }
 
-    private fun setRoundFinishedState(prevState: CountryGameState.RoundInProgress, awardPoint: Boolean = false) {
+    private fun setRoundFinishedState(roundResult: RoundResult = RoundResult.Draw) {
 
-        if (prevState.remainingLetters.isEmpty()) {
-            countryGameState.value = CountryGameState.CountryGameOver
-            return
-        }
-
-        val player1Score = if (awardPoint && !prevState.isPlayer1Turn) prevState.player1Score + 1 else prevState.player1Score
-        val player2Score = if (awardPoint && prevState.isPlayer1Turn) prevState.player2Score + 1 else prevState.player2Score
-        val currentLetter = prevState.remainingLetters.random()
-        val missedCountriesPrevRound = if (awardPoint) prevState.countriesRemaining else emptyList()
+        val player1Score = getPlayer1Score(
+            roundResult = roundResult,
+            player1Score = gameStateManager.prevState.player1Score,
+        )
+        val player2Score = getPlayer2Score(
+            roundResult = roundResult,
+            player2Score = gameStateManager.prevState.player2Score,
+        )
+        val missedCountriesPrevRound = if (roundResult == RoundResult.Draw) emptyList() else gameStateManager.prevState.countriesRemaining
+        val currentLetter = gameStateManager.prevState.remainingLetters.random()
         val countriesRemainingThisRound = allCountries.filter { it.name.common.first() == currentLetter }
-        val numOfCountriesRemaining = countriesRemainingThisRound.size
-        val remainingLetters = prevState.remainingLetters.filter { it != currentLetter }
-        val isPlayer1Turn = !prevState.isPlayer1Turn
-        val result = if (prevState.isPlayer1Turn) "${prevState.player2Name} won that round!" else "${prevState.player1Name} won that round!"
+        val resultBackgroundColor = if (roundResult == RoundResult.Draw) Color.LightGray else Color.Yellow
 
-        countryGameState.value = CountryGameState.RoundFinished(
-            player1Name = prevState.player1Name,
-            player2Name = prevState.player2Name,
-            currentLetter = currentLetter,
-            missedCountries = missedCountriesPrevRound,
-            player1Score = player1Score,
-            player2Score = player2Score,
-            numOfMissedCountries = missedCountriesPrevRound.size,
-            remainingLetters = remainingLetters,
-            isPlayer1Turn = isPlayer1Turn,
-            result = if (awardPoint) result else "Draw",
-            resultBackgroundColor = if (awardPoint) Color.Green else Color.LightGray,
+        val player1TurnColor = getScoreBoardColor(
+            isPlayer1Turn = gameStateManager.prevState.isPlayer1Turn,
+            player = Players.Player1,
         )
 
-        saveInProgressState(
-            prevState = prevState,
-            countriesRemaining = countriesRemainingThisRound,
-            numOfCountriesRemaining = numOfCountriesRemaining,
-            isPlayer1Turn = isPlayer1Turn,
+        val player2TurnColor = getScoreBoardColor(
+            isPlayer1Turn = gameStateManager.prevState.isPlayer1Turn,
+            player = Players.Player2,
+        )
+
+        gameStateManager.setRoundFinishedState(
             player1Score = player1Score,
             player2Score = player2Score,
+            missedCountriesPrevRound = missedCountriesPrevRound,
             currentLetter = currentLetter,
-            remainingLetters = remainingLetters,
+            countriesRemainingThisRound = countriesRemainingThisRound,
+            resultBackgroundColor = resultBackgroundColor,
+            player1TurnColor = player1TurnColor,
+            player2TurnColor = player2TurnColor,
         )
     }
 
-    private fun saveInProgressState(
-        prevState: CountryGameState.RoundInProgress,
-        countriesRemaining: List<Country>,
-        numOfCountriesRemaining: Int,
-        isPlayer1Turn: Boolean,
+    private fun getPlayer1Score(
+        roundResult: RoundResult,
         player1Score: Int,
+    ): Int {
+        return if (roundResult is RoundResult.Player1Won) player1Score + 1 else player1Score
+    }
+
+    private fun getPlayer2Score(
+        roundResult: RoundResult,
         player2Score: Int,
-        currentLetter: Char,
-        remainingLetters: List<Char>,
-    ) {
-        gameInProgressState = prevState.copy(
-            countriesRemaining = countriesRemaining,
-            player1Score = player1Score,
-            player2Score = player2Score,
-            player1Countries = emptyList(),
-            player2Countries = emptyList(),
-            currentLetter = currentLetter,
-            searchBarText = "",
-            numOfCountriesLeft = numOfCountriesRemaining,
-            isPlayer1Turn = isPlayer1Turn,
-            player1TurnColor = getScoreBoardColor(
-                isPlayer1Turn = isPlayer1Turn,
-                player = Players.Player1,
-            ),
-            player2TurnColor = getScoreBoardColor(
-                isPlayer1Turn = isPlayer1Turn,
-                player = Players.Player2,
-            ),
-            remainingLetters = remainingLetters,
-        )
+    ): Int {
+        return if (roundResult is RoundResult.Player2Won) player2Score + 1 else player2Score
     }
 
     private fun addCountryToCorrectlyGuessedList(country: String, player: Players): List<String> {
 
-        val state = countryGameState.value as CountryGameState.RoundInProgress
+        val state = gameStateManager.prevState
 
         return when (player) {
             is Players.Player1 -> {
@@ -190,26 +175,20 @@ class CountryGameServer @Inject constructor() {
         }
     }
 
-    fun startNextRound() {
-        countryGameState.value = gameInProgressState
-    }
+    fun startNextRound() = gameStateManager.startNextRound()
 
     private fun getScoreBoardColor(isPlayer1Turn: Boolean, player: Players): Color {
         return when (player) {
             is Players.Player1 -> {
-                if (isPlayer1Turn) Color.Green else Color.LightGray
+                if (isPlayer1Turn) Color.Yellow else Color.LightGray
             }
             is Players.Player2 -> {
-                if (isPlayer1Turn) Color.LightGray else Color.Green
+                if (isPlayer1Turn) Color.LightGray else Color.Yellow
             }
         }
     }
 
-    private fun updateSearchBar(countryName: String, state: CountryGameState.RoundInProgress) {
-        countryGameState.value = state.copy(searchBarText = countryName)
-    }
-
-    private fun getCountriesByRandomLetter(letter: Char): List<Country> {
+    private fun getCountriesByLetter(letter: Char): List<Country> {
         return allCountries.filter { it.name.common.first() == letter }
     }
 }

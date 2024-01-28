@@ -1,6 +1,7 @@
 package com.example.countriesgame.ui.gamescreen
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import com.example.countriesgame.ui.gamescreen.state.CountryGameState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,7 +27,12 @@ class GameScreenViewModel @Inject constructor(
         private set
 
     var bottomSheetState by mutableStateOf<BottomSheetState>(BottomSheetState.Hide)
+        private set
+
     private var allCountries: List<Country> = emptyList()
+
+    var animationFloat by mutableFloatStateOf(0F)
+        private set
 
     init {
         getCountries()
@@ -43,7 +50,7 @@ class GameScreenViewModel @Inject constructor(
 
     private fun loadCountriesIntoServer() = countryGameServer.loadCountries(allCountries)
 
-    fun onPlayerAnswered(countryGuessed: String) = countryGameServer.onPlayerAnswered(countryGuessed)
+    fun onPlayerAnswered(countryGuessed: String) = countryGameServer.onAnswerSubmitted(countryGuessed)
 
     fun onPlayerGaveUp() = countryGameServer.updateStateOnGiveUp()
 
@@ -75,5 +82,9 @@ class GameScreenViewModel @Inject constructor(
 
     private fun getCountryByName(name: String): Country {
         return allCountries.first { it.name.official == name || it.name.common.split(',').any { commonName -> commonName == name } }
+    }
+
+    fun increaseAnimationFloat() = viewModelScope.launch{
+        animationFloat += 0.2F
     }
 }

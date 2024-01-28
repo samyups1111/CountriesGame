@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
@@ -39,7 +40,6 @@ import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
 import com.example.countriesgame.ui.gamescreen.state.CountryGameState
 import com.example.countriesgame.ui.theme.CountriesGameTheme
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-
 
 @Composable
 fun GameScreen(
@@ -97,12 +97,17 @@ private fun GameScreenContent(
                     modifier = Modifier
                         .padding(10.dp)
                         .shadow(
-                            elevation = 10.dp,
+                            elevation = 5.dp,
+                            shape = CircleShape.copy(all = CornerSize(15.dp))
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = Color.Black,
                             shape = CircleShape.copy(all = CornerSize(15.dp))
                         )
                         .background(
                             color = countryGameState.resultBackgroundColor,
-                            shape = CircleShape.copy(all = CornerSize(15.dp))
+                            shape = CircleShape.copy(all = CornerSize(10.dp))
                         )
                         .padding(15.dp)
                 )
@@ -131,20 +136,36 @@ private fun GameScreenContent(
                         fontWeight = FontWeight.Bold,
                     )
                     LazyColumn(
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                        horizontalAlignment = CenterHorizontally,
+                        modifier = Modifier
+                            .weight(1F)
                     ) {
-                        items(countryGameState.missedCountries) { country ->
-                            Text(
-                                text = country.name.common,
+                        items(countryGameState.missedCountries) {country ->
+                            Card(
                                 modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                                    .shadow(elevation = 15.dp)
+                                    .border(
+                                        width = 1.dp,
+                                        shape = CircleShape.copy(all = CornerSize(15.dp)),
+                                        color = Color.Black
+                                    )
+                                    .padding(8.dp)
                                     .clickable(
                                         enabled = true,
                                     ) { showBottomSheet(country) }
-                            )
+                            ) {
+                                Row {
+                                    Text(text = country.flag)
+                                    Text(text = country.name.common)
+                                }
+                            }
+
                         }
                     }
                 }
-                Spacer(modifier = Modifier.weight(1F))
+                //Spacer(modifier = Modifier.weight(1F))
                 Button(
                     onClick = startNextRound,
                     modifier = Modifier
@@ -179,14 +200,19 @@ private fun GameScreenContent(
                     placeholder = { Text("Country") },
                     content = {},
                     modifier = Modifier
-                        .padding(10.dp)
-                        .height(75.dp)
+                        .shadow(elevation = 15.dp)
                         .border(
                             color = Color.Blue,
-                            width = 2.dp,
+                            width = 1.dp,
                             shape = CircleShape.copy(all = CornerSize(15.dp))
                         )
-                ) 
+                        .background(
+                            color = Color.White,
+                            shape = CircleShape.copy(all = CornerSize(15.dp))
+                        )
+                        .padding(5.dp)
+                        .height(70.dp)
+                )
                 Row() {
                     ScoreBoard(
                         name = countryGameState.player1Name,
@@ -231,11 +257,15 @@ private fun ScoreBoard(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
-            .fillMaxWidth()
             .padding(10.dp)
             .shadow(
-                elevation = 10.dp,
+                elevation = 15.dp,
                 shape = CircleShape.copy(all = CornerSize(15.dp)),
+            )
+            .border(
+                color = Color.Black,
+                width = 1.dp,
+                shape = CircleShape.copy(all = CornerSize(15.dp))
             )
             .background(
                 color = turnColor,
@@ -287,7 +317,7 @@ fun RoundInProgressPreview() {
                     numOfCountriesLeft = 22,
                     player1Score = 3,
                     player2Score = 1,
-                    player1TurnColor = Color.Green,
+                    player1TurnColor = Color.Yellow,
                     player1Countries = listOf("South Korea", "Senegal", "Somalia"),
                     player2Countries = listOf("South Africa"),
                 ),
@@ -344,7 +374,7 @@ fun RoundFinishedPreview() {
                     player2Score = 1,
                     remainingLetters = listOf('b', 'f', 'p'),
                     resultBackgroundColor = Color.Green,
-                )
+                ),
             )
         }
     }

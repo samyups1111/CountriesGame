@@ -2,9 +2,12 @@ package com.example.countriesgame.ui.gamescreen.state
 
 import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
+import com.example.countriesgame.model.RoundResult
 
 sealed class CountryGameState {
+
     object Loading : CountryGameState()
+
     data class RoundFinished(
         val player1Name: String = "Player 1",
         val player2Name: String = "Player 2",
@@ -17,8 +20,11 @@ sealed class CountryGameState {
         val player2Score: Int = 0,
         val isPlayer1Turn: Boolean = true,
         val remainingLetters: List<Char> = qualifiedLetters,
+        val roundResult: RoundResult = RoundResult.Draw,
     ) : CountryGameState()
+
     object CountryGameOver : CountryGameState()
+
     data class RoundInProgress(
         val player1Name: String = "Player 1",
         val player2Name: String = "Player 2",
