@@ -1,4 +1,4 @@
-package com.example.countriesgame.ui.gamescreen
+package com.example.countriesgame.ui.gamescreen.component
 
 import android.content.Intent
 import android.net.Uri

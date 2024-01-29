@@ -30,9 +30,6 @@ class GameScreenViewModel @Inject constructor(
 
     private var allCountries: List<Country> = emptyList()
 
-    var animationFloat by mutableFloatStateOf(0F)
-        private set
-
     init {
         getCountries()
     }
@@ -81,9 +78,5 @@ class GameScreenViewModel @Inject constructor(
 
     private fun getCountryByName(name: String): Country {
         return allCountries.first { it.name.official == name || it.name.common.split(',').any { commonName -> commonName == name } }
-    }
-
-    fun increaseAnimationFloat() = viewModelScope.launch{
-        animationFloat += 0.2F
     }
 }

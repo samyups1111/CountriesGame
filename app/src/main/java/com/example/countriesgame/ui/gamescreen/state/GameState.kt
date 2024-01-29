@@ -23,7 +23,9 @@ sealed class GameState {
         val roundResult: RoundResult = RoundResult.Draw,
     ) : GameState()
 
-    object GameOver : GameState()
+    data class GameOver(
+        val winner: String,
+    ) : GameState()
 
     data class RoundInProgress(
         val player1Name: String = "Player 1",

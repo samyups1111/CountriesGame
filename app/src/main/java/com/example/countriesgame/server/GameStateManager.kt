@@ -52,10 +52,7 @@ class GameStateManager @Inject constructor() {
         isPlayer1Turn: Boolean,
         result: String,
     ) {
-        if (prevState.remainingLetters.isEmpty()) {
-            gameState.value = GameState.GameOver
-            return
-        }
+
         val numOfCountriesRemaining = countriesRemainingThisRound.size
 
         gameState.value = GameState.RoundFinished(
@@ -81,8 +78,8 @@ class GameStateManager @Inject constructor() {
             player2Score = player2Score,
             currentLetter = currentLetter,
             remainingLetters = remainingLetters,
-            player1TurnColor = player1TurnColor,
-            player2TurnColor = player2TurnColor,
+            player1TurnColor = player2TurnColor,
+            player2TurnColor = player1TurnColor,
         )
     }
     private fun saveInProgressState(
@@ -135,5 +132,11 @@ class GameStateManager @Inject constructor() {
 
     fun startNextRound() {
         gameState.value = gameInProgressState
+    }
+
+    fun setGameOverState(winner: String) {
+        gameState.value = GameState.GameOver(
+            winner = winner,
+        )
     }
 }

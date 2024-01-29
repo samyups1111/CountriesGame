@@ -126,6 +126,9 @@ class CountryGameServer @Inject constructor(
         val isPlayer1Turn = !gameStateManager.prevState.isPlayer1Turn
         val result = if (isPlayer1Turn) "${gameStateManager.prevState.player2Name} won that round!" else "${gameStateManager.prevState.player1Name} won that round!"
 
+        val leadingPlayer = getLeadingPlayer(player1Score, player2Score)
+        if (isGameOver(remainingLetters, leadingPlayer)) return
+
         gameStateManager.setRoundFinishedState(
             player1Score = player1Score,
             player2Score = player2Score,
@@ -139,6 +142,25 @@ class CountryGameServer @Inject constructor(
             isPlayer1Turn = isPlayer1Turn,
             result = result,
         )
+    }
+
+    private fun getLeadingPlayer(
+        player1Score: Int,
+        player2Score: Int,
+    ): String {
+        return if (player1Score > player2Score) gameStateManager.prevState.player1Name
+        else if (player1Score < player2Score) gameStateManager.prevState.player2Name
+        else "To Both"
+    }
+
+    private fun isGameOver(
+        remainingLetters: List<Char>,
+        leadingPlayer: String,
+    ): Boolean {
+        return if (remainingLetters.isEmpty()) {
+            gameStateManager.setGameOverState(leadingPlayer)
+            true
+        } else false
     }
 
     private fun getPlayer1Score(

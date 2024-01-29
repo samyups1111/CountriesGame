@@ -1,4 +1,4 @@
-package com.example.countriesgame.ui.gamescreen
+package com.example.countriesgame.ui.gamescreen.page
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.countriesgame.ui.gamescreen.component.ScoreBoard
 import com.example.countriesgame.ui.gamescreen.state.GameState
 import com.example.countriesgame.ui.theme.CountriesGameTheme
 

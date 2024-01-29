@@ -1,4 +1,4 @@
-package com.example.countriesgame.ui.gamescreen
+package com.example.countriesgame.ui.gamescreen.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

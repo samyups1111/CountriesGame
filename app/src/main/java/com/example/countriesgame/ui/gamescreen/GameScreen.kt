@@ -9,6 +9,10 @@ import com.example.countriesgame.model.Country
 import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
 import com.example.countriesgame.ui.gamescreen.state.GameState
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.countriesgame.ui.gamescreen.component.CountryBottomSheet
+import com.example.countriesgame.ui.gamescreen.page.GameOverPage
+import com.example.countriesgame.ui.gamescreen.page.RoundFinishedPage
+import com.example.countriesgame.ui.gamescreen.page.RoundInProgressPage
 
 @Composable
 fun GameScreen(
@@ -20,7 +24,9 @@ fun GameScreen(
 
     when (gameState) {
         is GameState.GameOver -> {
-            Text(text = "Game Over. Thank you for playing.")
+            GameOverPage(
+                gameState = gameState as GameState.GameOver,
+            )
         }
         is GameState.Loading -> {
             Text(text = "Loading...")
