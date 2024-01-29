@@ -118,11 +118,13 @@ class CountryGameServer @Inject constructor(
             isPlayer1Turn = gameStateManager.prevState.isPlayer1Turn,
             player = Players.Player1,
         )
-
         val player2TurnColor = getScoreBoardColor(
             isPlayer1Turn = gameStateManager.prevState.isPlayer1Turn,
             player = Players.Player2,
         )
+        val remainingLetters = gameStateManager.prevState.remainingLetters.filter { it != currentLetter }
+        val isPlayer1Turn = !gameStateManager.prevState.isPlayer1Turn
+        val result = if (isPlayer1Turn) "${gameStateManager.prevState.player2Name} won that round!" else "${gameStateManager.prevState.player1Name} won that round!"
 
         gameStateManager.setRoundFinishedState(
             player1Score = player1Score,
@@ -133,6 +135,9 @@ class CountryGameServer @Inject constructor(
             resultBackgroundColor = resultBackgroundColor,
             player1TurnColor = player1TurnColor,
             player2TurnColor = player2TurnColor,
+            remainingLetters = remainingLetters,
+            isPlayer1Turn = isPlayer1Turn,
+            result = result,
         )
     }
 

@@ -48,16 +48,15 @@ class GameStateManager @Inject constructor() {
         resultBackgroundColor: Color,
         player1TurnColor: Color,
         player2TurnColor: Color,
+        remainingLetters: List<Char>,
+        isPlayer1Turn: Boolean,
+        result: String,
     ) {
         if (prevState.remainingLetters.isEmpty()) {
             countryGameState.value = CountryGameState.CountryGameOver
             return
         }
-
         val numOfCountriesRemaining = countriesRemainingThisRound.size
-        val remainingLetters = prevState.remainingLetters.filter { it != currentLetter }
-        val isPlayer1Turn = !prevState.isPlayer1Turn
-        val result = if (prevState.isPlayer1Turn) "${prevState.player2Name} won that round!" else "${prevState.player1Name} won that round!"
 
         countryGameState.value = CountryGameState.RoundFinished(
             player1Name = prevState.player1Name,
