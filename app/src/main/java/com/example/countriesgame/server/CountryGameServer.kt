@@ -3,7 +3,7 @@ package com.example.countriesgame.server
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
-import com.example.countriesgame.ui.gamescreen.state.CountryGameState
+import com.example.countriesgame.ui.gamescreen.state.GameState
 import com.example.countriesgame.model.Players
 import com.example.countriesgame.model.RoundResult
 import javax.inject.Inject
@@ -13,16 +13,16 @@ class CountryGameServer @Inject constructor(
 ) {
 
     private var allCountries: List<Country> = emptyList()
-    var countryGameState = gameStateManager.countryGameState
+    var countryGameState = gameStateManager.gameState
 
     fun loadCountries(countries: List<Country>) {
         allCountries = countries
     }
 
     fun startGame() {
-        val currentLetter = CountryGameState.qualifiedLetters.random()
+        val currentLetter = GameState.qualifiedLetters.random()
         val countriesRemaining = getCountriesByLetter(currentLetter)
-        val remainingLetters = getLettersRemaining(currentLetter, CountryGameState.qualifiedLetters)
+        val remainingLetters = getLettersRemaining(currentLetter, GameState.qualifiedLetters)
 
         gameStateManager.setStartState(
             startingLetter = currentLetter,

@@ -2,41 +2,41 @@ package com.example.countriesgame.server
 
 import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
-import com.example.countriesgame.ui.gamescreen.state.CountryGameState
+import com.example.countriesgame.ui.gamescreen.state.GameState
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 class GameStateManager @Inject constructor() {
 
-    var countryGameState : MutableStateFlow<CountryGameState> = MutableStateFlow(CountryGameState.Loading)
+    var gameState : MutableStateFlow<GameState> = MutableStateFlow(GameState.Loading)
         private set
 
-    var prevState = CountryGameState.RoundInProgress()
+    var prevState = GameState.RoundInProgress()
 
-    private var gameInProgressState = CountryGameState.RoundInProgress()
+    private var gameInProgressState = GameState.RoundInProgress()
 
     fun setStartState(
         startingLetter: Char,
         countriesRemaining: List<Country>,
         remainingLetters: List<Char>,
     ) {
-        val startState = CountryGameState.RoundInProgress(
+        val startState = GameState.RoundInProgress(
             currentLetter = startingLetter,
             countriesRemaining = countriesRemaining,
             numOfCountriesLeft = countriesRemaining.size,
             player1TurnColor = Color.Yellow,
             remainingLetters = remainingLetters,
         )
-        countryGameState.value = startState
+        gameState.value = startState
     }
 
     fun updateSearchBarState(text: String) {
-        countryGameState.value = prevState.copy(searchBarText = text)
+        gameState.value = prevState.copy(searchBarText = text)
 
     }
 
     fun savePreviousRoundInProgressState() {
-        prevState = countryGameState.value as CountryGameState.RoundInProgress
+        prevState = gameState.value as GameState.RoundInProgress
     }
 
     fun setRoundFinishedState(
@@ -53,12 +53,12 @@ class GameStateManager @Inject constructor() {
         result: String,
     ) {
         if (prevState.remainingLetters.isEmpty()) {
-            countryGameState.value = CountryGameState.CountryGameOver
+            gameState.value = GameState.GameOver
             return
         }
         val numOfCountriesRemaining = countriesRemainingThisRound.size
 
-        countryGameState.value = CountryGameState.RoundFinished(
+        gameState.value = GameState.RoundFinished(
             player1Name = prevState.player1Name,
             player2Name = prevState.player2Name,
             currentLetter = currentLetter,
@@ -86,7 +86,7 @@ class GameStateManager @Inject constructor() {
         )
     }
     private fun saveInProgressState(
-        prevState: CountryGameState.RoundInProgress,
+        prevState: GameState.RoundInProgress,
         countriesRemaining: List<Country>,
         numOfCountriesRemaining: Int,
         isPlayer1Turn: Boolean,
@@ -121,7 +121,7 @@ class GameStateManager @Inject constructor() {
         player1TurnColor: Color,
         player2TurnColor: Color,
         ) {
-        countryGameState.value = prevState.copy(
+        gameState.value = prevState.copy(
             countriesRemaining = countriesRemaining,
             player1Countries = player1Countries,
             player2Countries = player2Countries,
@@ -134,6 +134,6 @@ class GameStateManager @Inject constructor() {
     }
 
     fun startNextRound() {
-        countryGameState.value = gameInProgressState
+        gameState.value = gameInProgressState
     }
 }

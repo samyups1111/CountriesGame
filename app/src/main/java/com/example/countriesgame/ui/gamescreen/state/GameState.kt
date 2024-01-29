@@ -4,9 +4,9 @@ import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.RoundResult
 
-sealed class CountryGameState {
+sealed class GameState {
 
-    object Loading : CountryGameState()
+    object Loading : GameState()
 
     data class RoundFinished(
         val player1Name: String = "Player 1",
@@ -21,9 +21,9 @@ sealed class CountryGameState {
         val isPlayer1Turn: Boolean = true,
         val remainingLetters: List<Char> = qualifiedLetters,
         val roundResult: RoundResult = RoundResult.Draw,
-    ) : CountryGameState()
+    ) : GameState()
 
-    object CountryGameOver : CountryGameState()
+    object GameOver : GameState()
 
     data class RoundInProgress(
         val player1Name: String = "Player 1",
@@ -41,7 +41,7 @@ sealed class CountryGameState {
         val isPlayer1Turn: Boolean = true,
         val searchBarText: String = "",
         val remainingLetters: List<Char> = qualifiedLetters,
-    ) : CountryGameState()
+    ) : GameState()
 
     companion object {
         val qualifiedLetters = listOf(

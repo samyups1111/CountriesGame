@@ -24,13 +24,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.countriesgame.ui.gamescreen.state.CountryGameState
+import com.example.countriesgame.ui.gamescreen.state.GameState
 import com.example.countriesgame.ui.theme.CountriesGameTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoundInProgressPage(
-    gameState: CountryGameState.RoundInProgress,
+    gameState: GameState.RoundInProgress,
     onCountryGuessed: (String) -> Unit,
     showBottomSheetViaString: (String) -> Unit,
     onGiveUp: () -> Unit,
@@ -111,7 +111,7 @@ fun RoundInProgressPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             RoundInProgressPage(
-                gameState = CountryGameState.RoundInProgress(
+                gameState = GameState.RoundInProgress(
                     player1Name = "Sammy DJ",
                     currentLetter = 's',
                     numOfCountriesLeft = 22,

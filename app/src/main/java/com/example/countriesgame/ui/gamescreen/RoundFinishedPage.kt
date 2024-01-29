@@ -30,18 +30,17 @@ import com.example.countriesgame.model.CoatOfArms
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.CountryMap
 import com.example.countriesgame.model.CountryName
-import com.example.countriesgame.ui.gamescreen.state.CountryGameState
+import com.example.countriesgame.ui.gamescreen.state.GameState
 import com.example.countriesgame.ui.theme.CountriesGameTheme
 
 @Composable
 fun RoundFinishedPage(
-    roundFinishedState: CountryGameState.RoundFinished,
+    roundFinishedState: GameState.RoundFinished,
     showBottomSheetViaString: (String) -> Unit,
     showBottomSheet: (Country) -> Unit,
     startNextRound: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -142,7 +141,7 @@ fun RoundFinishedPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             RoundFinishedPage(
-                roundFinishedState = CountryGameState.RoundFinished(
+                roundFinishedState = GameState.RoundFinished(
                     player1Name = "Sammy DJ",
                     result = "Sammy DJ won that round!",
                     currentLetter = 'c',

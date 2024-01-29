@@ -10,11 +10,10 @@ import com.example.countriesgame.server.CountryGameServer
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.usecase.GetCountriesUseCase
 import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
-import com.example.countriesgame.ui.gamescreen.state.CountryGameState
+import com.example.countriesgame.ui.gamescreen.state.GameState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -23,7 +22,7 @@ class GameScreenViewModel @Inject constructor(
     private val countryGameServer: CountryGameServer,
 ): ViewModel() {
 
-    var countryGameStateFlow: MutableStateFlow<CountryGameState> = countryGameServer.countryGameState
+    var gameStateFlow: MutableStateFlow<GameState> = countryGameServer.countryGameState
         private set
 
     var bottomSheetState by mutableStateOf<BottomSheetState>(BottomSheetState.Hide)
