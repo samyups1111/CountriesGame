@@ -12,7 +12,7 @@ import dagger.hilt.android.components.ViewModelComponent
 abstract class RepositoryModule {
 
     @Binds
-    abstract fun bindNasaImageRepositoryImpl(
+    abstract fun bindCountryRepositoryImpl(
         repository: CountryRepositoryImpl,
     ): CountryRepository
 }

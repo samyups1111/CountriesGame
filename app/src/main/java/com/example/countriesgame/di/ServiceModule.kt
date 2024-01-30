@@ -1,6 +1,6 @@
 package com.example.countriesgame.di
 
-import com.example.countriesgame.networking.WikiService
+import com.example.countriesgame.networking.RestCountriesService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,9 +15,9 @@ object ServiceModule {
 
     @Singleton
     @Provides
-    fun provideNasaService(
+    fun provideRestCountriesService(
         retrofit: Retrofit,
-    ): WikiService = retrofit.create(WikiService::class.java)
+    ): RestCountriesService = retrofit.create(RestCountriesService::class.java)
 
     @Singleton
     @Provides

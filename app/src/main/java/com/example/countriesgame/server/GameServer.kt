@@ -8,7 +8,7 @@ import com.example.countriesgame.model.Players
 import com.example.countriesgame.model.RoundResult
 import javax.inject.Inject
 
-class CountryGameServer @Inject constructor(
+class GameServer @Inject constructor(
     private val gameStateManager: GameStateManager,
 ) {
 

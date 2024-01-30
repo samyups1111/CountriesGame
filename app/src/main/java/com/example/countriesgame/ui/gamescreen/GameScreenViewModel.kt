@@ -1,12 +1,11 @@
 package com.example.countriesgame.ui.gamescreen
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.countriesgame.server.CountryGameServer
+import com.example.countriesgame.server.GameServer
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.usecase.GetCountriesUseCase
 import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
@@ -19,10 +18,10 @@ import javax.inject.Inject
 @HiltViewModel
 class GameScreenViewModel @Inject constructor(
     private val getCountriesUseCase: GetCountriesUseCase,
-    private val countryGameServer: CountryGameServer,
+    private val gameServer: GameServer,
 ): ViewModel() {
 
-    var gameStateFlow: MutableStateFlow<GameState> = countryGameServer.countryGameState
+    var gameStateFlow: MutableStateFlow<GameState> = gameServer.countryGameState
         private set
 
     var bottomSheetState by mutableStateOf<BottomSheetState>(BottomSheetState.Hide)
@@ -42,15 +41,15 @@ class GameScreenViewModel @Inject constructor(
         }
     }
 
-    private fun startGame() = countryGameServer.startGame()
+    private fun startGame() = gameServer.startGame()
 
-    private fun loadCountriesIntoServer() = countryGameServer.loadCountries(allCountries)
+    private fun loadCountriesIntoServer() = gameServer.loadCountries(allCountries)
 
-    fun onPlayerAnswered(countryGuessed: String) = countryGameServer.onAnswerSubmitted(countryGuessed)
+    fun onPlayerAnswered(countryGuessed: String) = gameServer.onAnswerSubmitted(countryGuessed)
 
-    fun onPlayerGaveUp() = countryGameServer.updateStateOnGiveUp()
+    fun onPlayerGaveUp() = gameServer.updateStateOnGiveUp()
 
-    fun startNextRound() = countryGameServer.startNextRound()
+    fun startNextRound() = gameServer.startNextRound()
 
     fun hideBottomSheet() {
         bottomSheetState = BottomSheetState.Hide

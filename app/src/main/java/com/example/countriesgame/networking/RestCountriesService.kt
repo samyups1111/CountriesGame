@@ -5,11 +5,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-/**
- *
- * **See:** [wiki query doc](https://www.mediawiki.org/w/api.php?action=help&modules=query)
- */
-interface WikiService {
+interface RestCountriesService {
 
     @GET("independent?")
     suspend fun getAllCountries(
