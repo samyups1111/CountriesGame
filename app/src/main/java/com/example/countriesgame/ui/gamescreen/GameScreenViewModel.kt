@@ -5,13 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.countriesgame.server.GameServer
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.usecase.GetCountriesUseCase
+import com.example.countriesgame.server.GameServer
+import com.example.countriesgame.server.toGameScreenUiState
 import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
-import com.example.countriesgame.ui.gamescreen.state.GameState
+import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,34 +24,31 @@ class GameScreenViewModel @Inject constructor(
     private val getCountriesUseCase: GetCountriesUseCase,
     private val gameServer: GameServer,
 ): ViewModel() {
-
-    var gameStateFlow: MutableStateFlow<GameState> = gameServer.countryGameState
-        private set
-
+    val gameScreenUiStateFlow: StateFlow<GameScreenUiState> = gameServer.gameState.map { gameState ->
+        gameState.toGameScreenUiState()
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = GameScreenUiState.Loading,
+    )
     var bottomSheetState by mutableStateOf<BottomSheetState>(BottomSheetState.Hide)
         private set
 
-    private var allCountries: List<Country> = emptyList()
-
     init {
-        getCountries()
+        startGame()
     }
 
-    private fun getCountries() {
+    private fun startGame() {
         viewModelScope.launch {
-            allCountries = getCountriesUseCase.invoke()
-            loadCountriesIntoServer()
-            startGame()
+            val allCountries = getCountriesUseCase.invoke()
+            gameServer.setCountries(allCountries)
+            gameServer.startGame()
         }
     }
 
-    private fun startGame() = gameServer.startGame()
-
-    private fun loadCountriesIntoServer() = gameServer.loadCountries(allCountries)
-
     fun onPlayerAnswered(countryGuessed: String) = gameServer.onAnswerSubmitted(countryGuessed)
 
-    fun onPlayerGaveUp() = gameServer.updateStateOnGiveUp()
+    fun onPlayerGaveUp() = gameServer.onGiveUp()
 
     fun startNextRound() = gameServer.startNextRound()
 
@@ -76,6 +77,6 @@ class GameScreenViewModel @Inject constructor(
     }
 
     private fun getCountryByName(name: String): Country {
-        return allCountries.first { it.name.official == name || it.name.common.split(',').any { commonName -> commonName == name } }
+        return gameServer.allCountries.first { it.name.official == name || it.name.common.split(',').any { commonName -> commonName == name } }
     }
 }

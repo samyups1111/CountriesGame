@@ -25,13 +25,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.countriesgame.ui.gamescreen.component.ScoreBoard
-import com.example.countriesgame.ui.gamescreen.state.GameState
+import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 import com.example.countriesgame.ui.theme.CountriesGameTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoundInProgressPage(
-    gameState: GameState.RoundInProgress,
+    gameScreenUiState: GameScreenUiState.RoundInProgress,
     onCountryGuessed: (String) -> Unit,
     showBottomSheetViaString: (String) -> Unit,
     onGiveUp: () -> Unit,
@@ -43,15 +43,15 @@ fun RoundInProgressPage(
             .padding(5.dp)
     ) {
         Text(
-            text = "The current letter is: ${gameState.currentLetter}",
+            text = "The current letter is: ${gameScreenUiState.currentLetter}",
             fontSize = 30.sp,
         )
         Text(
-            text = "${gameState.numOfCountriesLeft} Countries Remaining!",
+            text = "${gameScreenUiState.numOfCountriesLeft} Countries Remaining!",
             fontSize = 20.sp,
         )
         SearchBar(
-            query = gameState.searchBarText,
+            query = gameScreenUiState.searchBarText,
             onQueryChange = onCountryGuessed,
             onSearch = {},
             active = true,
@@ -74,18 +74,18 @@ fun RoundInProgressPage(
         )
         Row() {
             ScoreBoard(
-                name = gameState.player1Name,
-                turnColor = gameState.player1TurnColor,
-                score = gameState.player1Score,
-                countriesGuessedCorrectly = gameState.player1Countries,
+                name = gameScreenUiState.player1Name,
+                turnColor = gameScreenUiState.player1TurnColor,
+                score = gameScreenUiState.player1Score,
+                countriesGuessedCorrectly = gameScreenUiState.player1Countries,
                 modifier = Modifier.weight(1F),
                 showBottomSheet = showBottomSheetViaString,
             )
             ScoreBoard(
-                name = gameState.player2Name,
-                turnColor = gameState.player2TurnColor,
-                score = gameState.player2Score,
-                countriesGuessedCorrectly = gameState.player2Countries,
+                name = gameScreenUiState.player2Name,
+                turnColor = gameScreenUiState.player2TurnColor,
+                score = gameScreenUiState.player2Score,
+                countriesGuessedCorrectly = gameScreenUiState.player2Countries,
                 modifier = Modifier.weight(1F),
                 showBottomSheet = showBottomSheetViaString,
             )
@@ -112,7 +112,7 @@ fun RoundInProgressPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             RoundInProgressPage(
-                gameState = GameState.RoundInProgress(
+                gameScreenUiState = GameScreenUiState.RoundInProgress(
                     player1Name = "Sammy DJ",
                     currentLetter = 's',
                     numOfCountriesLeft = 22,

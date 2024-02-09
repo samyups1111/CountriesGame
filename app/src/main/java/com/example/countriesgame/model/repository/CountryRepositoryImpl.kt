@@ -1,6 +1,7 @@
 package com.example.countriesgame.model.repository
 
 import com.example.countriesgame.model.Country
+import com.example.countriesgame.model.CountryRemote
 import com.example.countriesgame.model.toCountry
 import com.example.countriesgame.networking.RestCountriesService
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,19 +15,20 @@ class CountryRepositoryImpl @Inject constructor(
 ) : CountryRepository {
     override suspend fun getCountriesFromServer(): List<Country> = withContext(ioDispatcher) {
         val response = restCountriesService.getAllCountries()
-
         if (response.isSuccessful) {
-            val countriesRemote = response.body()
-
-            if (countriesRemote.isNullOrEmpty()) {
-                emptyList()
-            } else {
-                val countries = mutableListOf<Country>()
-                countriesRemote.forEach { countries.add(it.toCountry()) }
-                countries.toList()
-            }
+            processResponseBody(countriesRemote = response.body())
         } else {
             emptyList()
+        }
+    }
+
+    private fun processResponseBody(countriesRemote: List<CountryRemote>?): List<Country> {
+        return if (countriesRemote.isNullOrEmpty()) {
+            emptyList()
+        } else {
+            val countries = mutableListOf<Country>()
+            countriesRemote.forEach { countries.add(it.toCountry()) }
+            countries.toList()
         }
     }
 }

@@ -1,16 +1,31 @@
 package com.example.countriesgame.ui.gamescreen.page
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.countriesgame.ui.LottieLoader
-import com.example.countriesgame.ui.gamescreen.state.GameState
+import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 
 @Composable
 fun GameOverPage(
-    gameState: GameState.GameOver,
+    gameScreenUiState: GameScreenUiState.GameOver,
     modifier: Modifier = Modifier,
 ) {
-    Text(text = "Congratulations ${gameState.winner}")
-    LottieLoader()
+    Box(
+        modifier = modifier
+            .fillMaxSize(),
+    ) {
+        Text(
+            text = "Congratulations ${gameScreenUiState.winner}",
+            modifier = Modifier
+                .fillMaxSize()
+                .align(Alignment.Center)
+        )
+        LottieLoader(
+            modifier = modifier,
+        )
+    }
 }

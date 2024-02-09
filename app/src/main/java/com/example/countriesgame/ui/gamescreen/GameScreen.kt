@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
-import com.example.countriesgame.ui.gamescreen.state.GameState
+import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.countriesgame.ui.gamescreen.component.CountryBottomSheet
 import com.example.countriesgame.ui.gamescreen.page.GameOverPage
@@ -19,30 +19,30 @@ fun GameScreen(
     modifier: Modifier = Modifier,
     vm: GameScreenViewModel = hiltViewModel(),
 ) {
-    val gameState by vm.gameStateFlow.collectAsStateWithLifecycle()
+    val gameState by vm.gameScreenUiStateFlow.collectAsStateWithLifecycle()
     val bottomSheetState = vm.bottomSheetState
 
     when (gameState) {
-        is GameState.GameOver -> {
+        is GameScreenUiState.GameOver -> {
             GameOverPage(
-                gameState = gameState as GameState.GameOver,
+                gameScreenUiState = gameState as GameScreenUiState.GameOver,
             )
         }
-        is GameState.Loading -> {
+        is GameScreenUiState.Loading -> {
             Text(text = "Loading...")
         }
-        is GameState.RoundFinished -> {
+        is GameScreenUiState.RoundFinished -> {
             RoundFinishedPage(
-                roundFinishedState = gameState as GameState.RoundFinished,
+                roundFinishedState = gameState as GameScreenUiState.RoundFinished,
                 showBottomSheetViaString = { countryName: String -> vm.showBottomSheet(countryName) },
                 showBottomSheet = { country: Country -> vm.showBottomSheet(country) },
                 startNextRound = { vm.startNextRound() },
                 modifier = modifier,
             )
         }
-        is GameState.RoundInProgress -> {
+        is GameScreenUiState.RoundInProgress -> {
             RoundInProgressPage(
-                gameState = gameState as GameState.RoundInProgress,
+                gameScreenUiState = gameState as GameScreenUiState.RoundInProgress,
                 onCountryGuessed = { answer: String -> vm.onPlayerAnswered(answer) },
                 showBottomSheetViaString = { countryName: String -> vm.showBottomSheet(countryName) },
                 onGiveUp = { vm.onPlayerGaveUp() },

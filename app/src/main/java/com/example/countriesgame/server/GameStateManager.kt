@@ -2,17 +2,13 @@ package com.example.countriesgame.server
 
 import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
-import com.example.countriesgame.ui.gamescreen.state.GameState
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 class GameStateManager @Inject constructor() {
-
     var gameState : MutableStateFlow<GameState> = MutableStateFlow(GameState.Loading)
         private set
-
     var prevState = GameState.RoundInProgress()
-
     private var gameInProgressState = GameState.RoundInProgress()
 
     fun setStartState(
@@ -32,7 +28,6 @@ class GameStateManager @Inject constructor() {
 
     fun updateSearchBarState(text: String) {
         gameState.value = prevState.copy(searchBarText = text)
-
     }
 
     fun savePreviousRoundInProgressState() {
@@ -52,9 +47,7 @@ class GameStateManager @Inject constructor() {
         isPlayer1Turn: Boolean,
         result: String,
     ) {
-
         val numOfCountriesRemaining = countriesRemainingThisRound.size
-
         gameState.value = GameState.RoundFinished(
             player1Name = prevState.player1Name,
             player2Name = prevState.player2Name,
@@ -68,7 +61,6 @@ class GameStateManager @Inject constructor() {
             result = result,
             resultBackgroundColor = resultBackgroundColor,
         )
-
         saveInProgressState(
             prevState = prevState,
             countriesRemaining = countriesRemainingThisRound,
@@ -82,6 +74,7 @@ class GameStateManager @Inject constructor() {
             player2TurnColor = player1TurnColor,
         )
     }
+
     private fun saveInProgressState(
         prevState: GameState.RoundInProgress,
         countriesRemaining: List<Country>,

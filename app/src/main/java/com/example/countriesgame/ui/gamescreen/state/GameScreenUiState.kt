@@ -4,9 +4,9 @@ import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.RoundResult
 
-sealed class GameState {
+sealed class GameScreenUiState {
 
-    object Loading : GameState()
+    object Loading : GameScreenUiState()
 
     data class RoundFinished(
         val player1Name: String = "Player 1",
@@ -19,13 +19,13 @@ sealed class GameState {
         val player1Score: Int = 0,
         val player2Score: Int = 0,
         val isPlayer1Turn: Boolean = true,
-        val remainingLetters: List<Char> = qualifiedLetters,
+        val remainingLetters: List<Char> = emptyList(),
         val roundResult: RoundResult = RoundResult.Draw,
-    ) : GameState()
+    ) : GameScreenUiState()
 
     data class GameOver(
         val winner: String,
-    ) : GameState()
+    ) : GameScreenUiState()
 
     data class RoundInProgress(
         val player1Name: String = "Player 1",
@@ -42,13 +42,6 @@ sealed class GameState {
         val player2TurnColor: Color = Color.LightGray,
         val isPlayer1Turn: Boolean = true,
         val searchBarText: String = "",
-        val remainingLetters: List<Char> = qualifiedLetters,
-    ) : GameState()
-
-    companion object {
-        val qualifiedLetters = listOf(
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-            'L','M', 'N', 'O', 'P', 'Q', 'R','S', 'T', 'U', 'V', 'Y', 'Z'
-        )
-    }
+        val remainingLetters: List<Char> = emptyList(),
+    ) : GameScreenUiState()
 }
