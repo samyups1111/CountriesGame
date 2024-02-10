@@ -37,7 +37,6 @@ import com.example.countriesgame.ui.theme.CountriesGameTheme
 @Composable
 fun RoundFinishedPage(
     roundFinishedState: GameScreenUiState.RoundFinished,
-    showBottomSheetViaString: (String) -> Unit,
     showBottomSheet: (Country) -> Unit,
     startNextRound: () -> Unit,
     modifier: Modifier = Modifier,
@@ -69,20 +68,20 @@ fun RoundFinishedPage(
         )
         Row() {
             ScoreBoard(
-                name = roundFinishedState.player1Name,
+                name = roundFinishedState.player1.name,
                 turnColor = Color.LightGray,
-                score = roundFinishedState.player1Score,
+                score = roundFinishedState.player1.score,
                 countriesGuessedCorrectly = emptyList(),
                 modifier = Modifier.weight(1F),
-                showBottomSheet = showBottomSheetViaString,
+                showBottomSheet = showBottomSheet,
             )
             ScoreBoard(
-                name = roundFinishedState.player2Name,
+                name = roundFinishedState.player2.name,
                 turnColor = Color.LightGray,
-                score = roundFinishedState.player2Score,
+                score = roundFinishedState.player2.score,
                 countriesGuessedCorrectly = emptyList(),
                 modifier = Modifier.weight(1F),
-                showBottomSheet = showBottomSheetViaString,
+                showBottomSheet = showBottomSheet,
             )
         }
 
@@ -132,59 +131,59 @@ fun RoundFinishedPage(
     }
 }
 
-@Preview
-@Composable
-fun RoundFinishedPreview() {
-    CountriesGameTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            RoundFinishedPage(
-                roundFinishedState = GameScreenUiState.RoundFinished(
-                    player1Name = "Sammy DJ",
-                    result = "Sammy DJ won that round!",
-                    currentLetter = 'c',
-                    missedCountries = listOf(
-                        Country(
-                            id = "",
-                            name = CountryName("Canada", "Canada"),
-                            capital = listOf("capital"),
-                            region = "Americas",
-                            borders = listOf("USA"),
-                            coatOfArms = CoatOfArms("", ""),
-                            currencies = listOf("", "cad"),
-                            flag = "",
-                            maps = CountryMap("", ""),
-                            languages = listOf(""),
-                            population = 100000,
-                            unMember = true,
-                        ),
-                        Country(
-                            id = "",
-                            name = CountryName("Canada", "Canada"),
-                            capital = listOf("capital"),
-                            region = "Americas",
-                            borders = listOf("USA"),
-                            coatOfArms = CoatOfArms("", ""),
-                            currencies = listOf("", "cad"),
-                            flag = "",
-                            maps = CountryMap("", ""),
-                            languages = listOf(""),
-                            population = 100000,
-                            unMember = true,
-                        ),
-                    ),
-                    player1Score = 2,
-                    player2Score = 1,
-                    remainingLetters = listOf('b', 'f', 'p'),
-                    resultBackgroundColor = Color.Green,
-                ),
-                showBottomSheet = {},
-                showBottomSheetViaString = {},
-                startNextRound = {},
-            )
-        }
-    }
-}
+//@Preview
+//@Composable
+//fun RoundFinishedPreview() {
+//    CountriesGameTheme {
+//        // A surface container using the 'background' color from the theme
+//        Surface(
+//            modifier = Modifier.fillMaxSize(),
+//            color = MaterialTheme.colorScheme.background
+//        ) {
+//            RoundFinishedPage(
+//                roundFinishedState = GameScreenUiState.RoundFinished(
+//                    player1Name = "Sammy DJ",
+//                    result = "Sammy DJ won that round!",
+//                    currentLetter = 'c',
+//                    missedCountries = listOf(
+//                        Country(
+//                            id = "",
+//                            name = CountryName("Canada", "Canada"),
+//                            capital = listOf("capital"),
+//                            region = "Americas",
+//                            borders = listOf("USA"),
+//                            coatOfArms = CoatOfArms("", ""),
+//                            currencies = listOf("", "cad"),
+//                            flag = "",
+//                            maps = CountryMap("", ""),
+//                            languages = listOf(""),
+//                            population = 100000,
+//                            unMember = true,
+//                        ),
+//                        Country(
+//                            id = "",
+//                            name = CountryName("Canada", "Canada"),
+//                            capital = listOf("capital"),
+//                            region = "Americas",
+//                            borders = listOf("USA"),
+//                            coatOfArms = CoatOfArms("", ""),
+//                            currencies = listOf("", "cad"),
+//                            flag = "",
+//                            maps = CountryMap("", ""),
+//                            languages = listOf(""),
+//                            population = 100000,
+//                            unMember = true,
+//                        ),
+//                    ),
+//                    player1Score = 2,
+//                    player2Score = 1,
+//                    remainingLetters = listOf('b', 'f', 'p'),
+//                    resultBackgroundColor = Color.Green,
+//                ),
+//                showBottomSheet = {},
+//                showBottomSheetViaString = {},
+//                startNextRound = {},
+//            )
+//        }
+//    }
+//}

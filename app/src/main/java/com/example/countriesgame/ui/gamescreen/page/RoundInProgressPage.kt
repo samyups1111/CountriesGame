@@ -24,8 +24,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.countriesgame.model.Country
 import com.example.countriesgame.ui.gamescreen.component.ScoreBoard
 import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
+import com.example.countriesgame.ui.gamescreen.state.SearchBarState
 import com.example.countriesgame.ui.theme.CountriesGameTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,7 +35,7 @@ import com.example.countriesgame.ui.theme.CountriesGameTheme
 fun RoundInProgressPage(
     gameScreenUiState: GameScreenUiState.RoundInProgress,
     onCountryGuessed: (String) -> Unit,
-    showBottomSheetViaString: (String) -> Unit,
+    showBottomSheet: (Country) -> Unit,
     onGiveUp: () -> Unit,
     modifier: Modifier = Modifier,
     ) {
@@ -74,20 +76,20 @@ fun RoundInProgressPage(
         )
         Row() {
             ScoreBoard(
-                name = gameScreenUiState.player1Name,
+                name = gameScreenUiState.player1.name,
                 turnColor = gameScreenUiState.player1TurnColor,
-                score = gameScreenUiState.player1Score,
-                countriesGuessedCorrectly = gameScreenUiState.player1Countries,
+                score = gameScreenUiState.player1.score,
+                countriesGuessedCorrectly = gameScreenUiState.player1.countriesGuessedCorrectly,
                 modifier = Modifier.weight(1F),
-                showBottomSheet = showBottomSheetViaString,
+                showBottomSheet = showBottomSheet,
             )
             ScoreBoard(
-                name = gameScreenUiState.player2Name,
+                name = gameScreenUiState.player2.name,
                 turnColor = gameScreenUiState.player2TurnColor,
-                score = gameScreenUiState.player2Score,
-                countriesGuessedCorrectly = gameScreenUiState.player2Countries,
+                score = gameScreenUiState.player2.score,
+                countriesGuessedCorrectly = gameScreenUiState.player2.countriesGuessedCorrectly,
                 modifier = Modifier.weight(1F),
-                showBottomSheet = showBottomSheetViaString,
+                showBottomSheet = showBottomSheet,
             )
         }
         Spacer(modifier = Modifier.weight(1F))
@@ -102,30 +104,30 @@ fun RoundInProgressPage(
     }
 }
 
-@Preview
-@Composable
-fun RoundInProgressPreview() {
-    CountriesGameTheme {
-        // A surface container using the 'background' color from the theme
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            RoundInProgressPage(
-                gameScreenUiState = GameScreenUiState.RoundInProgress(
-                    player1Name = "Sammy DJ",
-                    currentLetter = 's',
-                    numOfCountriesLeft = 22,
-                    player1Score = 3,
-                    player2Score = 1,
-                    player1TurnColor = Color.Yellow,
-                    player1Countries = listOf("South Korea", "Senegal", "Somalia"),
-                    player2Countries = listOf("South Africa"),
-                ),
-                showBottomSheetViaString = {},
-                onCountryGuessed = {},
-                onGiveUp = {},
-            )
-        }
-    }
-}
+//@Preview
+//@Composable
+//fun RoundInProgressPreview() {
+//    CountriesGameTheme {
+//        // A surface container using the 'background' color from the theme
+//        Surface(
+//            modifier = Modifier.fillMaxSize(),
+//            color = MaterialTheme.colorScheme.background
+//        ) {
+//            RoundInProgressPage(
+//                gameScreenUiState = GameScreenUiState.RoundInProgress(
+//                    player1Name = "Sammy DJ",
+//                    currentLetter = 's',
+//                    numOfCountriesLeft = 22,
+//                    player1Score = 3,
+//                    player2Score = 1,
+//                    player1TurnColor = Color.Yellow,
+//                    player1Countries = listOf("South Korea", "Senegal", "Somalia"),
+//                    player2Countries = listOf("South Africa"),
+//                ),
+//                showBottomSheetViaString = {},
+//                onCountryGuessed = {},
+//                onGiveUp = {},
+//            )
+//        }
+//    }
+//}

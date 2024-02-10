@@ -18,14 +18,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.countriesgame.model.Country
 
 @Composable
 fun ScoreBoard(
     name: String,
     turnColor: Color,
     score: Int,
-    countriesGuessedCorrectly: List<String>,
-    showBottomSheet: (String) -> Unit,
+    countriesGuessedCorrectly: List<Country>,
+    showBottomSheet: (Country) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -61,7 +62,7 @@ fun ScoreBoard(
         ) {
             items(countriesGuessedCorrectly) { country ->
                 Text(
-                    text = country,
+                    text = country.name.common,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier

@@ -13,6 +13,7 @@ class CountryRepositoryImpl @Inject constructor(
     private val restCountriesService: RestCountriesService,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CountryRepository {
+
     override suspend fun getCountriesFromServer(): List<Country> = withContext(ioDispatcher) {
         val response = restCountriesService.getAllCountries()
         if (response.isSuccessful) {

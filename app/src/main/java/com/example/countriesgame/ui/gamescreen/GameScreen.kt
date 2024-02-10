@@ -34,7 +34,6 @@ fun GameScreen(
         is GameScreenUiState.RoundFinished -> {
             RoundFinishedPage(
                 roundFinishedState = gameState as GameScreenUiState.RoundFinished,
-                showBottomSheetViaString = { countryName: String -> vm.showBottomSheet(countryName) },
                 showBottomSheet = { country: Country -> vm.showBottomSheet(country) },
                 startNextRound = { vm.startNextRound() },
                 modifier = modifier,
@@ -44,7 +43,7 @@ fun GameScreen(
             RoundInProgressPage(
                 gameScreenUiState = gameState as GameScreenUiState.RoundInProgress,
                 onCountryGuessed = { answer: String -> vm.onPlayerAnswered(answer) },
-                showBottomSheetViaString = { countryName: String -> vm.showBottomSheet(countryName) },
+                showBottomSheet = { country: Country -> vm.showBottomSheet(country) },
                 onGiveUp = { vm.onPlayerGaveUp() },
                 modifier = modifier,
             )

@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.countriesgame.model.Country
+import com.example.countriesgame.model.Player
 import com.example.countriesgame.model.usecase.GetCountriesUseCase
 import com.example.countriesgame.server.GameServer
 import com.example.countriesgame.server.toGameScreenUiState
@@ -34,6 +35,21 @@ class GameScreenViewModel @Inject constructor(
     var bottomSheetState by mutableStateOf<BottomSheetState>(BottomSheetState.Hide)
         private set
 
+    private val player1 = Player(
+        id = 1,
+        name = "Player 1",
+        score = 0,
+        countriesGuessedCorrectly = listOf(),
+        isItsTurn = true
+    )
+    private val player2 = Player(
+        id = 2,
+        name = "Player 2",
+        score = 0,
+        countriesGuessedCorrectly = listOf(),
+        isItsTurn = false
+    )
+
     init {
         startGame()
     }
@@ -42,13 +58,20 @@ class GameScreenViewModel @Inject constructor(
         viewModelScope.launch {
             val allCountries = getCountriesUseCase.invoke()
             gameServer.setCountries(allCountries)
-            gameServer.startGame()
+            gameServer.startGame(
+                player1,
+                player2,
+            )
         }
     }
 
-    fun onPlayerAnswered(countryGuessed: String) = gameServer.onAnswerSubmitted(countryGuessed)
+    fun onPlayerAnswered(answer: String) {
+        gameServer.onAnswerSubmitted(answer)
+    }
 
-    fun onPlayerGaveUp() = gameServer.onGiveUp()
+    fun onPlayerGaveUp() {
+        gameServer.onGiveUp()
+    }
 
     fun startNextRound() = gameServer.startNextRound()
 
@@ -70,13 +93,5 @@ class GameScreenViewModel @Inject constructor(
             currencies = country.currencies.toString(),
             borders = country.borders.toString(),
             )
-    }
-    fun showBottomSheet(countryName: String) {
-        val country = getCountryByName(countryName)
-        showBottomSheet(country)
-    }
-
-    private fun getCountryByName(name: String): Country {
-        return gameServer.allCountries.first { it.name.official == name || it.name.common.split(',').any { commonName -> commonName == name } }
     }
 }
