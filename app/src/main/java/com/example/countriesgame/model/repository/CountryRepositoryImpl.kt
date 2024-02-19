@@ -2,7 +2,6 @@ package com.example.countriesgame.model.repository
 
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.CountryRemote
-import com.example.countriesgame.model.toCountry
 import com.example.countriesgame.networking.RestCountriesService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -28,8 +27,35 @@ class CountryRepositoryImpl @Inject constructor(
             emptyList()
         } else {
             val countries = mutableListOf<Country>()
-            countriesRemote.forEach { countries.add(it.toCountry()) }
+            countriesRemote.forEach { countries.add(it.toDomain()) }
             countries.toList()
         }
+    }
+
+    private fun CountryRemote.toDomain(): Country {
+
+        val languages = mutableListOf<String>()
+        val currencies = mutableListOf<String>()
+        this.languages.values.forEach { language ->
+            languages.add(language)
+        }
+        this.currencies.values.forEach {  currency ->
+            currencies.add(currency.symbol + " " + currency.name)
+        }
+
+        return Country(
+            id = this.id,
+            name = this.name,
+            capital = this.capital,
+            coatOfArms = this.coatOfArms,
+            flag = this.flag,
+            languages = languages,
+            maps = this.maps,
+            population = this.population,
+            region = this.region,
+            unMember = this.unMember,
+            currencies = currencies,
+            borders = this.borders,
+        )
     }
 }

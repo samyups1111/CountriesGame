@@ -54,7 +54,7 @@ android {
 
 dependencies {
 
-    val navigationVersion = "2.7.6"
+    val navigationVersion = "2.7.7"
 
 
     implementation("androidx.core:core-ktx:1.12.0")
@@ -65,12 +65,12 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.compose.material3:material3:1.2.0")
     implementation("androidx.navigation:navigation-compose:$navigationVersion")
 
     implementation("com.google.dagger:hilt-android:2.49")
     kapt("com.google.dagger:hilt-android-compiler:2.48")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0-beta01")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0-rc01")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -83,7 +83,7 @@ dependencies {
     // Hilt
     implementation("com.google.dagger:hilt-android:2.49")
     kapt("com.google.dagger:hilt-android-compiler:2.48")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0-beta01")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0-rc01")
 
     // Lottie
     implementation("com.airbnb.android:lottie-compose:4.2.0")

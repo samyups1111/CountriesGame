@@ -5,10 +5,11 @@ import com.example.countriesgame.model.Player
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
-class GameServerImp @Inject constructor(): GameServer {
-    override var allCountries: List<Country> = emptyList()
+class GameServerImpl @Inject constructor(): GameServer {
+
     override var gameState : MutableStateFlow<GameState> = MutableStateFlow(GameState.Loading)
         private set
+    private lateinit var allCountries: List<Country>
 
     override fun setCountries(countries: List<Country>) {
         allCountries = countries
@@ -42,32 +43,40 @@ class GameServerImp @Inject constructor(): GameServer {
     }
 
     override fun startNextRound() {
+        if (gameState.value !is GameState.RoundFinished) return
+        val nextLetter = getNewRandomLetter()
+        val countriesRemainingNextRound = getCountriesByLetter(nextLetter)
+        val remainingLettersNextRound = getRemainingLetters(letterToFilter = nextLetter)
         val currentState = gameState.value as GameState.RoundFinished
-        val currentLetter = getNewRandomLetter(currentState.remainingLetters)
-        val countriesRemainingThisRound = getCountriesByLetter(currentLetter)
-        val remainingLetters = getRemainingLettersAfterFilteringOut(currentState.remainingLetters, currentLetter)
-        val player1 = currentState.player1.copy(
-            countriesGuessedCorrectly = emptyList(),
-        )
-        val player2 = currentState.player2.copy(
-            countriesGuessedCorrectly = emptyList(),
-        )
+        val player1 = currentState.player1.copy(countriesGuessedCorrectly = emptyList())
+        val player2 = currentState.player2.copy(countriesGuessedCorrectly = emptyList())
 
         gameState.value = GameState.RoundInProgress(
             player1 = player1,
             player2 = player2,
-            currentLetter = currentLetter,
-            countriesRemaining = countriesRemainingThisRound,
-            numOfCountriesLeft = countriesRemainingThisRound.size,
-            remainingLetters = remainingLetters,
+            currentLetter = nextLetter,
+            countriesRemaining = countriesRemainingNextRound,
+            numOfCountriesLeft = countriesRemainingNextRound.size,
+            remainingLetters = remainingLettersNextRound,
             currentAnswer = "",
         )
     }
 
+    private fun getNewRandomLetter(): Char {
+        val remainingLetters = (gameState.value as GameState.RoundFinished).remainingLetters
+        return remainingLetters.random()
+    }
+
+    private fun getRemainingLetters(letterToFilter: Char): List<Char> {
+        val remainingLetters = (gameState.value as GameState.RoundFinished).remainingLetters
+        return remainingLetters.filter { it != letterToFilter }
+    }
+
     override fun onAnswerSubmitted(answer: String) {
+        val countriesRemaining = (gameState.value as GameState.RoundInProgress).countriesRemaining
         updateAnswer(answer)
-        (gameState.value as GameState.RoundInProgress).countriesRemaining.forEach { country ->
-            if (answerMatchesCountry(answer, country)) {
+        countriesRemaining.forEach { country ->
+            if (country.hasName(answer)) {
                 onCorrectAnswerSubmitted(country.name.common)
             }
         }
@@ -77,28 +86,37 @@ class GameServerImp @Inject constructor(): GameServer {
         gameState.value = (gameState.value as GameState.RoundInProgress).copy(currentAnswer = newAnswer)
     }
 
-    private fun answerMatchesCountry(answer: String, country: Country): Boolean {
-        val guessFormatted = answer.trim()
-        val commonNameList = country.name.common.split(',')
-        return country.name.official.equals(guessFormatted, ignoreCase = true) ||
-                commonNameList.any {  name -> name.equals(guessFormatted, ignoreCase = true) }
+    private fun Country.hasName(answer: String): Boolean {
+        val answerFormatted = answer.trim()
+        val officialName = this.name.official
+        val commonNames = this.name.common
+        return answerFormatted.equals(officialName, ignoreCase = true) || answerFormatted.inCommonNames(commonNames)
+    }
+
+    private fun String.inCommonNames(commonNames: String): Boolean {
+        val commonNamesList = commonNames.split(',')
+        commonNamesList.forEach { name ->
+            if (name.equals(this, ignoreCase = true)) return true
+        }
+        return false
     }
 
     private fun onCorrectAnswerSubmitted(countryName: String) {
-        if (moreCountriesStillRemainThisRound()) updateRoundInProgressAfterCorrectAnswer(countryName)
+        if (moreCountriesRemainingThisRound()) updateRoundInProgressAfterCorrectAnswer(countryName)
         else roundFinishedInDraw()
     }
 
-    private fun moreCountriesStillRemainThisRound(): Boolean {
-        val countriesRemainingThisRound = (gameState.value as GameState.RoundInProgress).numOfCountriesLeft - 1
-        return countriesRemainingThisRound > 0
+    private fun moreCountriesRemainingThisRound(): Boolean {
+        val prevNumOfCountriesRemaining = (gameState.value as GameState.RoundInProgress).numOfCountriesLeft
+        val currentNumOfCountriesRemaining = prevNumOfCountriesRemaining - 1
+        return currentNumOfCountriesRemaining > 0
     }
 
     private fun updateRoundInProgressAfterCorrectAnswer(answer: String) {
         val answerCountry = getCountryByName(answer)
         val currentState = gameState.value as GameState.RoundInProgress
         val numOfCountriesRemaining = currentState.numOfCountriesLeft - 1
-        val countriesRemaining = currentState.countriesRemaining.filter { it.name.common != answer && it.name.official != answer}
+        val countriesRemaining = getRemainingCountries(answer)
         val player1Countries = getUpdatedCorrectlyAnsweredCountries(
             country = answerCountry,
             player = currentState.player1,
@@ -128,6 +146,11 @@ class GameServerImp @Inject constructor(): GameServer {
         return allCountries.first { it.name.common == name }
     }
 
+    private fun getRemainingCountries(answer: String): List<Country> {
+        val countriesRemaining = (gameState.value as GameState.RoundInProgress).countriesRemaining
+        return countriesRemaining.filter { it.name.common != answer && it.name.official != answer}
+    }
+
     private fun getUpdatedCorrectlyAnsweredCountries(country: Country, player: Player): List<Country> {
         return if (player.isItsTurn) addCountryToList(country, player.countriesGuessedCorrectly)
         else player.countriesGuessedCorrectly
@@ -150,15 +173,8 @@ class GameServerImp @Inject constructor(): GameServer {
             currentLetter = state.currentLetter,
             missedCountries = emptyList(),
             remainingLetters = state.remainingLetters,
+            roundWinner = Player(0, "You both", 0, emptyList(), false)
         )
-    }
-
-    private fun getNewRandomLetter(remainingLetters: List<Char>): Char {
-        return remainingLetters.random()
-    }
-
-    private fun getRemainingLettersAfterFilteringOut(remainingLetters: List<Char>, currentLetter: Char): List<Char> {
-        return remainingLetters.filter { it != currentLetter }
     }
 
     private fun isGameOver(): Boolean {
@@ -173,7 +189,7 @@ class GameServerImp @Inject constructor(): GameServer {
         val state = gameState.value as GameState.RoundInProgress
         val player1Score = state.player1.score
         val player2Score = state.player2.score
-        val winner = if (player1Score < player2Score) state.player1
+        val winner = if (player1Score < player2Score) state.player2
         else state.player1
         gameState.value = GameState.GameOver(
             winner = winner,
@@ -181,7 +197,9 @@ class GameServerImp @Inject constructor(): GameServer {
     }
 
     override fun onGiveUp() {
+        if (gameState.value !is GameState.RoundInProgress) return
         val prevState = gameState.value as GameState.RoundInProgress
+        val roundWinner = getRoundWinnerAfterGiveUp()
         val player1Score = getUpdatedScore(prevState.player1)
         val player2Score = getUpdatedScore(prevState.player2)
         val player1 = prevState.player1.copy(
@@ -202,11 +220,18 @@ class GameServerImp @Inject constructor(): GameServer {
             missedCountries = prevState.countriesRemaining,
             numOfMissedCountries = prevState.countriesRemaining.size,
             remainingLetters = prevState.remainingLetters,
+            roundWinner = roundWinner,
         )
     }
 
+    private fun getRoundWinnerAfterGiveUp(): Player {
+        val state = (gameState.value as GameState.RoundInProgress)
+        val isCurrentlyPlayer1Turn = state.player1.isItsTurn
+        return if (isCurrentlyPlayer1Turn) state.player2 else state.player1
+    }
+
     private fun getUpdatedScore(player: Player): Int {
-        return if (!player.isItsTurn) player.score + 1 else player.score
+        return if (player.isItsTurn) player.score else player.score + 1
     }
 
     companion object {

@@ -1,7 +1,7 @@
 package com.example.countriesgame.di
 
 import com.example.countriesgame.server.GameServer
-import com.example.countriesgame.server.GameServerImp
+import com.example.countriesgame.server.GameServerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -12,6 +12,6 @@ import dagger.hilt.android.components.ViewModelComponent
 abstract class GameServerModule {
     @Binds
     abstract fun bindGameServerImpl(
-        gameServer: GameServerImp,
+        gameServer: GameServerImpl,
     ): GameServer
 }

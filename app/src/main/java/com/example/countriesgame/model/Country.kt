@@ -55,30 +55,3 @@ data class CoatOfArms(
     val svg: String,
     val png: String,
 )
-
-fun CountryRemote.toCountry(): Country {
-
-    val languages = mutableListOf<String>()
-    val currencies = mutableListOf<String>()
-    this.languages.values.forEach { language ->
-        languages.add(language)
-    }
-    this.currencies.values.forEach {  currency ->
-        currencies.add(currency.symbol + " " + currency.name)
-    }
-
-    return Country(
-        id = this.id,
-        name = this.name,
-        capital = this.capital,
-        coatOfArms = this.coatOfArms,
-        flag = this.flag,
-        languages = languages,
-        maps = this.maps,
-        population = this.population,
-        region = this.region,
-        unMember = this.unMember,
-        currencies = currencies,
-        borders = this.borders,
-    )
-}

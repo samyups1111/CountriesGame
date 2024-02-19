@@ -3,13 +3,14 @@ package com.example.countriesgame.ui.gamescreen
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.Player
 import com.example.countriesgame.model.usecase.GetCountriesUseCase
 import com.example.countriesgame.server.GameServer
-import com.example.countriesgame.server.toGameScreenUiState
+import com.example.countriesgame.server.GameState
 import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
 import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,7 @@ class GameScreenViewModel @Inject constructor(
     private val getCountriesUseCase: GetCountriesUseCase,
     private val gameServer: GameServer,
 ): ViewModel() {
+
     val gameScreenUiStateFlow: StateFlow<GameScreenUiState> = gameServer.gameState.map { gameState ->
         gameState.toGameScreenUiState()
     }.stateIn(
@@ -93,5 +95,43 @@ class GameScreenViewModel @Inject constructor(
             currencies = country.currencies.toString(),
             borders = country.borders.toString(),
             )
+    }
+
+    private fun GameState.toGameScreenUiState(): GameScreenUiState {
+        return when (this) {
+            is GameState.GameOver -> {
+                GameScreenUiState.GameOver(
+                    winner = this.winner.name,
+                )
+            }
+            is GameState.Loading -> {
+                GameScreenUiState.Loading
+            }
+            is GameState.RoundInProgress -> {
+                GameScreenUiState.RoundInProgress(
+                    player1 = player1,
+                    player2 = player2,
+                    currentLetter = this.currentLetter,
+                    countriesRemaining = this.countriesRemaining,
+                    numOfCountriesLeft = this.numOfCountriesLeft,
+                    searchBarText = this.currentAnswer,
+                    remainingLetters = this.remainingLetters,
+                    player1TurnColor = if (this.player1.isItsTurn) Color.Yellow else Color.LightGray,
+                    player2TurnColor = if (this.player2.isItsTurn) Color.Yellow else Color.LightGray,
+                )
+            }
+            is GameState.RoundFinished -> {
+                GameScreenUiState.RoundFinished(
+                    player1 = player1,
+                    player2 = player2,
+                    currentLetter = this.currentLetter,
+                    missedCountries = this.missedCountries,
+                    numOfMissedCountries = this.numOfMissedCountries,
+                    remainingLetters = this.remainingLetters,
+                    result = "Result: ${this.roundWinner.name} Won!",
+                    resultBackgroundColor = if (this.roundWinner.id == 0) Color.LightGray else Color.Yellow,
+                )
+            }
+        }
     }
 }
