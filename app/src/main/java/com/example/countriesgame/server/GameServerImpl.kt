@@ -10,15 +10,22 @@ class GameServerImpl @Inject constructor(): GameServer {
     override var gameState : MutableStateFlow<GameState> = MutableStateFlow(GameState.Loading)
         private set
     private lateinit var allCountries: List<Country>
+    private lateinit var player1: Player
+    private lateinit var player2: Player
 
     override fun setCountries(countries: List<Country>) {
         allCountries = countries
     }
 
-    override fun startGame(
-        player1: Player,
-        player2: Player,
+    override fun setPlayers(
+        playerOne: Player,
+        playerTwo: Player,
     ) {
+        player1 = playerOne
+        player2 = playerTwo
+    }
+
+    override fun startGame() {
         val startingLetter = allLettersWithCountryInitial.random()
         val countriesRemaining = getCountriesByLetter(startingLetter)
         val lettersRemaining = getAllLettersExcept(startingLetter)
@@ -189,11 +196,8 @@ class GameServerImpl @Inject constructor(): GameServer {
         val state = gameState.value as GameState.RoundInProgress
         val player1Score = state.player1.score
         val player2Score = state.player2.score
-        val winner = if (player1Score < player2Score) state.player2
-        else state.player1
-        gameState.value = GameState.GameOver(
-            winner = winner,
-        )
+        val winner = if (player1Score < player2Score) state.player2 else state.player1
+        gameState.value = GameState.GameOver(winner = winner)
     }
 
     override fun onGiveUp() {

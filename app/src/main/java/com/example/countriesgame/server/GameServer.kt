@@ -9,10 +9,11 @@ interface GameServer {
     val gameState: StateFlow<GameState>
 
     fun setCountries(countries: List<Country>)
-    fun startGame(
-        player1: Player,
-        player2: Player,
+    fun setPlayers(
+        playerOne: Player,
+        playerTwo: Player,
     )
+    fun startGame()
     fun onAnswerSubmitted(answer: String)
     fun onGiveUp()
     fun startNextRound()

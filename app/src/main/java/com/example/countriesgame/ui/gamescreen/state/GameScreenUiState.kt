@@ -12,7 +12,7 @@ sealed class GameScreenUiState {
         val player1: Player,
         val player2: Player,
         val resultBackgroundColor: Color = Color.LightGray,
-        val result: String = "Result: Draw",
+        val resultText: String = "Result: Draw",
         val currentLetter: Char = ' ',
         val missedCountries: List<Country> = emptyList(),
         val numOfMissedCountries: Int = 100,

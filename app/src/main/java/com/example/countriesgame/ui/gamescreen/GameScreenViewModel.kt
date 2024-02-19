@@ -59,27 +59,19 @@ class GameScreenViewModel @Inject constructor(
     private fun startGame() {
         viewModelScope.launch {
             val allCountries = getCountriesUseCase.invoke()
-            gameServer.setCountries(allCountries)
-            gameServer.startGame(
-                player1,
-                player2,
-            )
+            gameServer.setCountries(countries = allCountries)
+            gameServer.setPlayers(playerOne = player1, playerTwo = player2)
+            gameServer.startGame()
         }
     }
 
-    fun onPlayerAnswered(answer: String) {
-        gameServer.onAnswerSubmitted(answer)
-    }
+    fun onPlayerAnswered(answer: String) { gameServer.onAnswerSubmitted(answer = answer) }
 
-    fun onPlayerGaveUp() {
-        gameServer.onGiveUp()
-    }
+    fun onPlayerGaveUp() { gameServer.onGiveUp() }
 
     fun startNextRound() = gameServer.startNextRound()
 
-    fun hideBottomSheet() {
-        bottomSheetState = BottomSheetState.Hide
-    }
+    fun hideBottomSheet() { bottomSheetState = BottomSheetState.Hide }
 
     fun showBottomSheet(country: Country) {
         bottomSheetState = BottomSheetState.Show(
@@ -99,14 +91,10 @@ class GameScreenViewModel @Inject constructor(
 
     private fun GameState.toGameScreenUiState(): GameScreenUiState {
         return when (this) {
-            is GameState.GameOver -> {
-                GameScreenUiState.GameOver(
-                    winner = this.winner.name,
-                )
-            }
-            is GameState.Loading -> {
-                GameScreenUiState.Loading
-            }
+            is GameState.GameOver -> { GameScreenUiState.GameOver(winner = this.winner.name) }
+
+            is GameState.Loading -> { GameScreenUiState.Loading }
+
             is GameState.RoundInProgress -> {
                 GameScreenUiState.RoundInProgress(
                     player1 = player1,
@@ -116,10 +104,11 @@ class GameScreenViewModel @Inject constructor(
                     numOfCountriesLeft = this.numOfCountriesLeft,
                     searchBarText = this.currentAnswer,
                     remainingLetters = this.remainingLetters,
-                    player1TurnColor = if (this.player1.isItsTurn) Color.Yellow else Color.LightGray,
-                    player2TurnColor = if (this.player2.isItsTurn) Color.Yellow else Color.LightGray,
+                    player1TurnColor = getPlayer1TurnColor(isPlayer1Turn = this.player1.isItsTurn),
+                    player2TurnColor = getPlayer2TurnColor(isPlayer2Turn = this.player2.isItsTurn),
                 )
             }
+
             is GameState.RoundFinished -> {
                 GameScreenUiState.RoundFinished(
                     player1 = player1,
@@ -128,10 +117,26 @@ class GameScreenViewModel @Inject constructor(
                     missedCountries = this.missedCountries,
                     numOfMissedCountries = this.numOfMissedCountries,
                     remainingLetters = this.remainingLetters,
-                    result = "Result: ${this.roundWinner.name} Won!",
-                    resultBackgroundColor = if (this.roundWinner.id == 0) Color.LightGray else Color.Yellow,
+                    resultText = getResultText(winnerName = this.roundWinner.name),
+                    resultBackgroundColor = getResultBackgroundColor(playerId = this.roundWinner.id),
                 )
             }
         }
+    }
+
+    private fun getPlayer1TurnColor(isPlayer1Turn: Boolean): Color {
+        return if (isPlayer1Turn) Color.Yellow else Color.LightGray
+    }
+
+    private fun getPlayer2TurnColor(isPlayer2Turn: Boolean): Color {
+        return if (isPlayer2Turn) Color.Yellow else Color.LightGray
+    }
+
+    private fun getResultText(winnerName: String): String {
+        return "Result: $winnerName Won!"
+    }
+
+    private fun getResultBackgroundColor(playerId: Int): Color {
+        return if (playerId == 0) Color.LightGray else Color.Yellow
     }
 }
