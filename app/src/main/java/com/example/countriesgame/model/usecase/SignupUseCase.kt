@@ -11,6 +11,6 @@ class SignupUseCase @Inject constructor(
         email: String,
         password: String,
     ): SignupResult {
-        return userRepository.signupNewUser(email, password)
+        return userRepository.signup(email, password)
     }
 }

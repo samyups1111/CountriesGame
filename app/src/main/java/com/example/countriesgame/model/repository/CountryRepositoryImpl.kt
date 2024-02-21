@@ -2,19 +2,19 @@ package com.example.countriesgame.model.repository
 
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.CountryRemote
-import com.example.countriesgame.networking.RestCountriesService
+import com.example.countriesgame.networking.CountriesService
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CountryRepositoryImpl @Inject constructor(
-    private val restCountriesService: RestCountriesService,
+    private val countriesService: CountriesService,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) : CountryRepository {
 
     override suspend fun getCountriesFromServer(): List<Country> = withContext(ioDispatcher) {
-        val response = restCountriesService.getAllCountries()
+        val response = countriesService.getAllCountries()
         if (response.isSuccessful) {
             processResponseBody(countriesRemote = response.body())
         } else {

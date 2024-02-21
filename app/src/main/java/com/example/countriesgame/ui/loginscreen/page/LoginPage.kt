@@ -28,7 +28,7 @@ fun LoginPage(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(5.dp),
+        verticalArrangement = Arrangement.Center,
         modifier = modifier
             .padding(5.dp),
     ) {
@@ -37,6 +37,7 @@ fun LoginPage(
             onValueChange = updateEmailTextField,
             placeholder = { Text("email") },
             modifier = Modifier
+                .padding(3.dp)
                 .border(
                     BorderStroke(width = 1.dp, color = Color.Black)
                 )
@@ -46,27 +47,38 @@ fun LoginPage(
             onValueChange = updatePasswordTextField,
             placeholder = { Text("password") },
             modifier = Modifier
+                .padding(3.dp)
                 .border(
                     BorderStroke(width = 1.dp, color = Color.Black)
                 )
         )
         Button(
             onClick = login,
+            modifier = Modifier
+                .padding(3.dp)
         ) {
-            Text(text = "Submit")
+            Text(
+                text = "Submit",
+                modifier = Modifier
+                    .padding(3.dp)
+            )
         }
         Text(
             text = "Don't have an account?",
             color = Color.Blue,
             modifier = Modifier
+                .padding(3.dp)
                 .clickable(
                     enabled = true,
                     onClick = goToSignupPage,
                 )
         )
         if (state.error != "") {
-            Spacer(modifier = Modifier.weight(1f))
-            Text(text = state.error)
+            Text(
+                text = state.error,
+                modifier = Modifier
+                    .padding(3.dp)
+            )
         }
     }
 }
