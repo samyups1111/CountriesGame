@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.countriesgame.model.Country
-import com.example.countriesgame.model.Player
+import com.example.countriesgame.model.User
 import com.example.countriesgame.model.usecase.GetCountriesUseCase
 import com.example.countriesgame.server.GameServer
 import com.example.countriesgame.server.GameState
@@ -37,14 +37,14 @@ class GameScreenViewModel @Inject constructor(
     var bottomSheetState by mutableStateOf<BottomSheetState>(BottomSheetState.Hide)
         private set
 
-    private val player1 = Player(
+    private val user1 = User(
         id = 1,
         name = "Player 1",
         score = 0,
         countriesGuessedCorrectly = listOf(),
         isItsTurn = true
     )
-    private val player2 = Player(
+    private val user2 = User(
         id = 2,
         name = "Player 2",
         score = 0,
@@ -60,7 +60,7 @@ class GameScreenViewModel @Inject constructor(
         viewModelScope.launch {
             val allCountries = getCountriesUseCase.invoke()
             gameServer.setCountries(countries = allCountries)
-            gameServer.setPlayers(playerOne = player1, playerTwo = player2)
+            gameServer.setPlayers(userOne = user1, userTwo = user2)
             gameServer.startGame()
         }
     }
@@ -97,22 +97,22 @@ class GameScreenViewModel @Inject constructor(
 
             is GameState.RoundInProgress -> {
                 GameScreenUiState.RoundInProgress(
-                    player1 = player1,
-                    player2 = player2,
+                    user1 = user1,
+                    user2 = user2,
                     currentLetter = this.currentLetter,
                     countriesRemaining = this.countriesRemaining,
                     numOfCountriesLeft = this.numOfCountriesLeft,
                     searchBarText = this.currentAnswer,
                     remainingLetters = this.remainingLetters,
-                    player1TurnColor = getPlayer1TurnColor(isPlayer1Turn = this.player1.isItsTurn),
-                    player2TurnColor = getPlayer2TurnColor(isPlayer2Turn = this.player2.isItsTurn),
+                    player1TurnColor = getPlayer1TurnColor(isPlayer1Turn = this.user1.isItsTurn),
+                    player2TurnColor = getPlayer2TurnColor(isPlayer2Turn = this.user2.isItsTurn),
                 )
             }
 
             is GameState.RoundFinished -> {
                 GameScreenUiState.RoundFinished(
-                    player1 = player1,
-                    player2 = player2,
+                    user1 = user1,
+                    user2 = user2,
                     currentLetter = this.currentLetter,
                     missedCountries = this.missedCountries,
                     numOfMissedCountries = this.numOfMissedCountries,

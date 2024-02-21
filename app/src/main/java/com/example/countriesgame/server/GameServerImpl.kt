@@ -1,7 +1,7 @@
 package com.example.countriesgame.server
 
 import com.example.countriesgame.model.Country
-import com.example.countriesgame.model.Player
+import com.example.countriesgame.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
@@ -10,19 +10,19 @@ class GameServerImpl @Inject constructor(): GameServer {
     override var gameState : MutableStateFlow<GameState> = MutableStateFlow(GameState.Loading)
         private set
     private lateinit var allCountries: List<Country>
-    private lateinit var player1: Player
-    private lateinit var player2: Player
+    private lateinit var user1: User
+    private lateinit var user2: User
 
     override fun setCountries(countries: List<Country>) {
         allCountries = countries
     }
 
     override fun setPlayers(
-        playerOne: Player,
-        playerTwo: Player,
+        userOne: User,
+        userTwo: User,
     ) {
-        player1 = playerOne
-        player2 = playerTwo
+        user1 = userOne
+        user2 = userTwo
     }
 
     override fun startGame() {
@@ -30,8 +30,8 @@ class GameServerImpl @Inject constructor(): GameServer {
         val countriesRemaining = getCountriesByLetter(startingLetter)
         val lettersRemaining = getAllLettersExcept(startingLetter)
         val startState = GameState.RoundInProgress(
-            player1 = player1,
-            player2 = player2,
+            user1 = user1,
+            user2 = user2,
             currentLetter = startingLetter,
             countriesRemaining = countriesRemaining,
             numOfCountriesLeft = countriesRemaining.size,
@@ -55,12 +55,12 @@ class GameServerImpl @Inject constructor(): GameServer {
         val countriesRemainingNextRound = getCountriesByLetter(nextLetter)
         val remainingLettersNextRound = getRemainingLetters(letterToFilter = nextLetter)
         val currentState = gameState.value as GameState.RoundFinished
-        val player1 = currentState.player1.copy(countriesGuessedCorrectly = emptyList())
-        val player2 = currentState.player2.copy(countriesGuessedCorrectly = emptyList())
+        val player1 = currentState.user1.copy(countriesGuessedCorrectly = emptyList())
+        val player2 = currentState.user2.copy(countriesGuessedCorrectly = emptyList())
 
         gameState.value = GameState.RoundInProgress(
-            player1 = player1,
-            player2 = player2,
+            user1 = player1,
+            user2 = player2,
             currentLetter = nextLetter,
             countriesRemaining = countriesRemainingNextRound,
             numOfCountriesLeft = countriesRemainingNextRound.size,
@@ -126,24 +126,24 @@ class GameServerImpl @Inject constructor(): GameServer {
         val countriesRemaining = getRemainingCountries(answer)
         val player1Countries = getUpdatedCorrectlyAnsweredCountries(
             country = answerCountry,
-            player = currentState.player1,
+            user = currentState.user1,
         )
         val player2Countries = getUpdatedCorrectlyAnsweredCountries(
             country = answerCountry,
-            player = currentState.player2,
+            user = currentState.user2,
         )
-        val player1 = currentState.player1.copy(
+        val player1 = currentState.user1.copy(
             countriesGuessedCorrectly = player1Countries,
-            isItsTurn = !currentState.player1.isItsTurn,
+            isItsTurn = !currentState.user1.isItsTurn,
         )
-        val player2 = currentState.player2.copy(
+        val player2 = currentState.user2.copy(
             countriesGuessedCorrectly = player2Countries,
-            isItsTurn = !currentState.player2.isItsTurn,
+            isItsTurn = !currentState.user2.isItsTurn,
         )
         gameState.value = currentState.copy(
             countriesRemaining = countriesRemaining,
-            player1 = player1,
-            player2 = player2,
+            user1 = player1,
+            user2 = player2,
             numOfCountriesLeft = numOfCountriesRemaining,
             currentAnswer = "",
         )
@@ -158,9 +158,9 @@ class GameServerImpl @Inject constructor(): GameServer {
         return countriesRemaining.filter { it.name.common != answer && it.name.official != answer}
     }
 
-    private fun getUpdatedCorrectlyAnsweredCountries(country: Country, player: Player): List<Country> {
-        return if (player.isItsTurn) addCountryToList(country, player.countriesGuessedCorrectly)
-        else player.countriesGuessedCorrectly
+    private fun getUpdatedCorrectlyAnsweredCountries(country: Country, user: User): List<Country> {
+        return if (user.isItsTurn) addCountryToList(country, user.countriesGuessedCorrectly)
+        else user.countriesGuessedCorrectly
     }
 
     private fun addCountryToList(country: Country, countries: List<Country>): List<Country> {
@@ -175,12 +175,12 @@ class GameServerImpl @Inject constructor(): GameServer {
         if (isGameOver()) return
 
         gameState.value = GameState.RoundFinished(
-            player1 = state.player1,
-            player2 = state.player2,
+            user1 = state.user1,
+            user2 = state.user2,
             currentLetter = state.currentLetter,
             missedCountries = emptyList(),
             remainingLetters = state.remainingLetters,
-            roundWinner = Player(0, "You both", 0, emptyList(), false)
+            roundWinner = User(0, "You both", 0, emptyList(), false)
         )
     }
 
@@ -194,9 +194,9 @@ class GameServerImpl @Inject constructor(): GameServer {
 
     private fun setGameOverState() {
         val state = gameState.value as GameState.RoundInProgress
-        val player1Score = state.player1.score
-        val player2Score = state.player2.score
-        val winner = if (player1Score < player2Score) state.player2 else state.player1
+        val player1Score = state.user1.score
+        val player2Score = state.user2.score
+        val winner = if (player1Score < player2Score) state.user2 else state.user1
         gameState.value = GameState.GameOver(winner = winner)
     }
 
@@ -204,22 +204,22 @@ class GameServerImpl @Inject constructor(): GameServer {
         if (gameState.value !is GameState.RoundInProgress) return
         val prevState = gameState.value as GameState.RoundInProgress
         val roundWinner = getRoundWinnerAfterGiveUp()
-        val player1Score = getUpdatedScore(prevState.player1)
-        val player2Score = getUpdatedScore(prevState.player2)
-        val player1 = prevState.player1.copy(
+        val player1Score = getUpdatedScore(prevState.user1)
+        val player2Score = getUpdatedScore(prevState.user2)
+        val player1 = prevState.user1.copy(
             score = player1Score,
-            isItsTurn = !prevState.player1.isItsTurn,
+            isItsTurn = !prevState.user1.isItsTurn,
         )
-        val player2 = prevState.player2.copy(
+        val player2 = prevState.user2.copy(
             score = player2Score,
-            isItsTurn = !prevState.player2.isItsTurn,
+            isItsTurn = !prevState.user2.isItsTurn,
         )
 
         if (isGameOver()) return
 
         gameState.value = GameState.RoundFinished(
-            player1 = player1,
-            player2 = player2,
+            user1 = player1,
+            user2 = player2,
             currentLetter = prevState.currentLetter,
             missedCountries = prevState.countriesRemaining,
             numOfMissedCountries = prevState.countriesRemaining.size,
@@ -228,14 +228,14 @@ class GameServerImpl @Inject constructor(): GameServer {
         )
     }
 
-    private fun getRoundWinnerAfterGiveUp(): Player {
+    private fun getRoundWinnerAfterGiveUp(): User {
         val state = (gameState.value as GameState.RoundInProgress)
-        val isCurrentlyPlayer1Turn = state.player1.isItsTurn
-        return if (isCurrentlyPlayer1Turn) state.player2 else state.player1
+        val isCurrentlyPlayer1Turn = state.user1.isItsTurn
+        return if (isCurrentlyPlayer1Turn) state.user2 else state.user1
     }
 
-    private fun getUpdatedScore(player: Player): Int {
-        return if (player.isItsTurn) player.score else player.score + 1
+    private fun getUpdatedScore(user: User): Int {
+        return if (user.isItsTurn) user.score else user.score + 1
     }
 
     companion object {

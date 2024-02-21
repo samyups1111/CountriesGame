@@ -60,17 +60,17 @@ fun RoundFinishedPage(
         )
         Row() {
             ScoreBoard(
-                name = roundFinishedState.player1.name,
+                name = roundFinishedState.user1.name,
                 turnColor = Color.LightGray,
-                score = roundFinishedState.player1.score,
+                score = roundFinishedState.user1.score,
                 countriesGuessedCorrectly = emptyList(),
                 modifier = Modifier.weight(1F),
                 showBottomSheet = showBottomSheet,
             )
             ScoreBoard(
-                name = roundFinishedState.player2.name,
+                name = roundFinishedState.user2.name,
                 turnColor = Color.LightGray,
-                score = roundFinishedState.player2.score,
+                score = roundFinishedState.user2.score,
                 countriesGuessedCorrectly = emptyList(),
                 modifier = Modifier.weight(1F),
                 showBottomSheet = showBottomSheet,

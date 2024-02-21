@@ -2,15 +2,15 @@ package com.example.countriesgame.ui.gamescreen.state
 
 import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country
-import com.example.countriesgame.model.Player
+import com.example.countriesgame.model.User
 
 sealed class GameScreenUiState {
 
     object Loading : GameScreenUiState()
 
     data class RoundFinished(
-        val player1: Player,
-        val player2: Player,
+        val user1: User,
+        val user2: User,
         val resultBackgroundColor: Color = Color.LightGray,
         val resultText: String = "Result: Draw",
         val currentLetter: Char = ' ',
@@ -25,8 +25,8 @@ sealed class GameScreenUiState {
     ) : GameScreenUiState()
 
     data class RoundInProgress(
-        val player1: Player,
-        val player2: Player,
+        val user1: User,
+        val user2: User,
         val currentLetter: Char = ' ',
         val countriesRemaining: List<Country> = emptyList(),
         val numOfCountriesLeft: Int = 100,

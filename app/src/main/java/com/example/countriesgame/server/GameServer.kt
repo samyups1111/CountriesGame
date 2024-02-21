@@ -1,7 +1,7 @@
 package com.example.countriesgame.server
 
 import com.example.countriesgame.model.Country
-import com.example.countriesgame.model.Player
+import com.example.countriesgame.model.User
 import kotlinx.coroutines.flow.StateFlow
 
 interface GameServer {
@@ -10,8 +10,8 @@ interface GameServer {
 
     fun setCountries(countries: List<Country>)
     fun setPlayers(
-        playerOne: Player,
-        playerTwo: Player,
+        userOne: User,
+        userTwo: User,
     )
     fun startGame()
     fun onAnswerSubmitted(answer: String)

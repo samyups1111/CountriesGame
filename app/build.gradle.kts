@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -87,6 +88,11 @@ dependencies {
 
     // Lottie
     implementation("com.airbnb.android:lottie-compose:4.2.0")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+    implementation("com.google.firebase:firebase-auth")
+
 
 
     testImplementation("junit:junit:4.13.2")
