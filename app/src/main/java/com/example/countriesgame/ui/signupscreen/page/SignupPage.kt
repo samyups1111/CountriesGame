@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.countriesgame.ui.signupscreen.state.SignupScreenUiState
 
@@ -38,7 +40,8 @@ fun SignupPage(
             placeholder = { Text("email") },
             modifier = Modifier
                 .padding(3.dp)
-                .border(BorderStroke(width = 1.dp, color = Color.Black)
+                .border(
+                    BorderStroke(width = 1.dp, color = Color.Black)
                 )
         )
         TextField(
@@ -47,7 +50,8 @@ fun SignupPage(
             placeholder = { Text("password") },
             modifier = Modifier
                 .padding(3.dp)
-                .border(BorderStroke(width = 1.dp, color = Color.Black)
+                .border(
+                    BorderStroke(width = 1.dp, color = Color.Black)
                 )
         )
         TextField(
@@ -56,7 +60,8 @@ fun SignupPage(
             placeholder = { Text("re-enter password") },
             modifier = Modifier
                 .padding(3.dp)
-                .border(BorderStroke(width = 1.dp, color = Color.Black)
+                .border(
+                    BorderStroke(width = 1.dp, color = Color.Black)
                 )
         )
         Button(
@@ -88,4 +93,22 @@ fun SignupPage(
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SignupPagePreview() {
+    SignupPage(
+        state = SignupScreenUiState.InProgress(
+            email = "email@yahoo.com",
+            password = "myPassword4"
+        ),
+        updateUserNameTextField = {},
+        updatePasswordTextField = {},
+        updatePasswordRepeatTextField = {},
+        goToLoginPage = {},
+        createNewUser = {},
+        modifier = Modifier
+            .fillMaxSize()
+    )
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -18,9 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.countriesgame.model.Country
+import com.example.countriesgame.model.User
 import com.example.countriesgame.ui.gamescreen.component.ScoreBoard
 import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 
@@ -98,30 +101,32 @@ fun RoundInProgressPage(
     }
 }
 
-//@Preview
-//@Composable
-//fun RoundInProgressPreview() {
-//    CountriesGameTheme {
-//        // A surface container using the 'background' color from the theme
-//        Surface(
-//            modifier = Modifier.fillMaxSize(),
-//            color = MaterialTheme.colorScheme.background
-//        ) {
-//            RoundInProgressPage(
-//                gameScreenUiState = GameScreenUiState.RoundInProgress(
-//                    player1Name = "Sammy DJ",
-//                    currentLetter = 's',
-//                    numOfCountriesLeft = 22,
-//                    player1Score = 3,
-//                    player2Score = 1,
-//                    player1TurnColor = Color.Yellow,
-//                    player1Countries = listOf("South Korea", "Senegal", "Somalia"),
-//                    player2Countries = listOf("South Africa"),
-//                ),
-//                showBottomSheetViaString = {},
-//                onCountryGuessed = {},
-//                onGiveUp = {},
-//            )
-//        }
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun RoundInProgressPreview() {
+    RoundInProgressPage(
+        gameScreenUiState = GameScreenUiState.RoundInProgress(
+            user1 = User(
+                id = 0,
+                name = "sam",
+                score = 3,
+                countriesGuessedCorrectly = emptyList(),
+                isItsTurn = true
+            ),
+            user2 = User(
+                id = 2,
+                name = "Angel",
+                score = 1,
+                countriesGuessedCorrectly = emptyList(),
+                isItsTurn = false,
+            ),
+            currentLetter = 's',
+            numOfCountriesLeft = 22,
+            player1TurnColor = Color.Yellow,
+        ),
+        onCountryGuessed = {},
+        onGiveUp = {},
+        showBottomSheet =  {},
+        modifier = Modifier.fillMaxSize(),
+    )
+}

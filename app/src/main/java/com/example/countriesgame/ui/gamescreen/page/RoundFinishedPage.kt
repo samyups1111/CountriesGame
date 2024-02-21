@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,9 +21,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.countriesgame.model.CoatOfArms
 import com.example.countriesgame.model.Country
+import com.example.countriesgame.model.CountryMap
+import com.example.countriesgame.model.CountryName
+import com.example.countriesgame.model.User
 import com.example.countriesgame.ui.gamescreen.component.ScoreBoard
 import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 
@@ -123,59 +129,61 @@ fun RoundFinishedPage(
     }
 }
 
-//@Preview
-//@Composable
-//fun RoundFinishedPreview() {
-//    CountriesGameTheme {
-//        // A surface container using the 'background' color from the theme
-//        Surface(
-//            modifier = Modifier.fillMaxSize(),
-//            color = MaterialTheme.colorScheme.background
-//        ) {
-//            RoundFinishedPage(
-//                roundFinishedState = GameScreenUiState.RoundFinished(
-//                    player1Name = "Sammy DJ",
-//                    result = "Sammy DJ won that round!",
-//                    currentLetter = 'c',
-//                    missedCountries = listOf(
-//                        Country(
-//                            id = "",
-//                            name = CountryName("Canada", "Canada"),
-//                            capital = listOf("capital"),
-//                            region = "Americas",
-//                            borders = listOf("USA"),
-//                            coatOfArms = CoatOfArms("", ""),
-//                            currencies = listOf("", "cad"),
-//                            flag = "",
-//                            maps = CountryMap("", ""),
-//                            languages = listOf(""),
-//                            population = 100000,
-//                            unMember = true,
-//                        ),
-//                        Country(
-//                            id = "",
-//                            name = CountryName("Canada", "Canada"),
-//                            capital = listOf("capital"),
-//                            region = "Americas",
-//                            borders = listOf("USA"),
-//                            coatOfArms = CoatOfArms("", ""),
-//                            currencies = listOf("", "cad"),
-//                            flag = "",
-//                            maps = CountryMap("", ""),
-//                            languages = listOf(""),
-//                            population = 100000,
-//                            unMember = true,
-//                        ),
-//                    ),
-//                    player1Score = 2,
-//                    player2Score = 1,
-//                    remainingLetters = listOf('b', 'f', 'p'),
-//                    resultBackgroundColor = Color.Green,
-//                ),
-//                showBottomSheet = {},
-//                showBottomSheetViaString = {},
-//                startNextRound = {},
-//            )
-//        }
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun RoundFinishedPreview() {
+    RoundFinishedPage(
+        roundFinishedState = GameScreenUiState.RoundFinished(
+            user1 = User(
+                id = 0,
+                name = "sam",
+                score = 3,
+                countriesGuessedCorrectly = emptyList(),
+                isItsTurn = true
+            ),
+            user2 = User(
+                id = 2,
+                name = "Angel",
+                score = 1,
+                countriesGuessedCorrectly = emptyList(),
+                isItsTurn = false,
+            ),
+            currentLetter = 'c',
+            missedCountries = listOf(
+                Country(
+                    id = "",
+                    name = CountryName("United States", "USA"),
+                    capital = listOf("capital"),
+                    region = "Americas",
+                    borders = listOf("USA"),
+                    coatOfArms = CoatOfArms("", ""),
+                    currencies = listOf("", "cad"),
+                    flag = "",
+                    maps = CountryMap("", ""),
+                    languages = listOf(""),
+                    population = 100000,
+                    unMember = true,
+                ),
+                Country(
+                    id = "",
+                    name = CountryName("Canada", "Canada"),
+                    capital = listOf("capital"),
+                    region = "Americas",
+                    borders = listOf("USA"),
+                    coatOfArms = CoatOfArms("", ""),
+                    currencies = listOf("", "cad"),
+                    flag = "",
+                    maps = CountryMap("", ""),
+                    languages = listOf(""),
+                    population = 100000,
+                    unMember = true,
+                ),
+            ),
+            remainingLetters = listOf('b', 'f', 'p'),
+            resultBackgroundColor = Color.Green,
+        ),
+        showBottomSheet = {},
+        startNextRound = {},
+        modifier = Modifier.fillMaxSize()
+    )
+}
