@@ -8,12 +8,12 @@ class UserRepositoryImpl @Inject constructor(
     private val auth: AuthService,
 ) : UserRepository {
 
-    override suspend fun signup(email: String, password: String): SignupResult {
-        return auth.signup(email, password)
+    override suspend fun signupWithEmailAndPassword(email: String, password: String): SignupResult {
+        return auth.signupWithEmailAndPassword(email, password)
     }
 
-    override suspend fun login(email: String, password: String): SignupResult {
-        return auth.login(email, password)
+    override suspend fun loginWithEmailAndPassword(email: String, password: String): SignupResult {
+        return auth.loginWithEmailAndPassword(email, password)
     }
 
     override suspend fun signOut() {

@@ -11,14 +11,13 @@ import javax.inject.Inject
 
 class FirebaseAuthService @Inject constructor(
     private val auth: FirebaseAuth,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
-    ): AuthService {
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+): AuthService {
 
-    override suspend fun signup(
+    override suspend fun signupWithEmailAndPassword(
         email: String,
         password: String,
     ): SignupResult = withContext(ioDispatcher) {
-
         try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
             val user: FirebaseUser? = result.user
@@ -30,7 +29,7 @@ class FirebaseAuthService @Inject constructor(
         }
     }
 
-    override suspend fun login(email: String, password: String): SignupResult = withContext(ioDispatcher) {
+    override suspend fun loginWithEmailAndPassword(email: String, password: String): SignupResult = withContext(ioDispatcher) {
         try {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             val user: FirebaseUser? = result.user
@@ -43,4 +42,4 @@ class FirebaseAuthService @Inject constructor(
     }
 
     override suspend fun logOut() = withContext(ioDispatcher) { auth.signOut() }
-    }
+}

@@ -1,16 +1,15 @@
 package com.example.countriesgame.model.usecase
 
-import com.example.countriesgame.model.repository.UserRepository
+import com.example.countriesgame.networking.AuthService
 import javax.inject.Inject
 
 class SignupUseCase @Inject constructor(
-    private val userRepository: UserRepository,
+    private val auth: AuthService,
 ) {
-
     suspend fun invoke(
         email: String,
         password: String,
     ): SignupResult {
-        return userRepository.signup(email, password)
+        return auth.signupWithEmailAndPassword(email, password)
     }
 }
