@@ -1,4 +1,4 @@
-package com.example.countriesgame.ui.signupscreen.page
+package com.example.countriesgame.ui.loginscreen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -16,16 +16,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.countriesgame.ui.signupscreen.state.SignupScreenUiState
+import com.example.countriesgame.model.loginscreen.LoginScreenViewData
 
 @Composable
-fun SignupPage(
-    state: SignupScreenUiState.InProgress,
-    updateUserNameTextField: (String) -> Unit,
+fun LoginPage(
+    state: LoginScreenViewData,
+    updateEmailTextField: (String) -> Unit,
     updatePasswordTextField: (String) -> Unit,
-    updatePasswordRepeatTextField: (String) -> Unit,
-    goToLoginPage: () -> Unit,
-    createNewUser: () -> Unit,
+    goToSignupPage: () -> Unit,
+    login: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -36,7 +35,7 @@ fun SignupPage(
     ) {
         TextField(
             value = state.email,
-            onValueChange = updateUserNameTextField,
+            onValueChange = updateEmailTextField,
             placeholder = { Text("email") },
             modifier = Modifier
                 .padding(3.dp)
@@ -54,18 +53,8 @@ fun SignupPage(
                     BorderStroke(width = 1.dp, color = Color.Black)
                 )
         )
-        TextField(
-            value = state.passwordRepeat,
-            onValueChange = updatePasswordRepeatTextField,
-            placeholder = { Text("re-enter password") },
-            modifier = Modifier
-                .padding(3.dp)
-                .border(
-                    BorderStroke(width = 1.dp, color = Color.Black)
-                )
-        )
         Button(
-            onClick = createNewUser,
+            onClick = login,
             modifier = Modifier
                 .padding(3.dp)
         ) {
@@ -76,13 +65,13 @@ fun SignupPage(
             )
         }
         Text(
-           text = "Already have an account?",
+            text = "Don't have an account?",
             color = Color.Blue,
             modifier = Modifier
                 .padding(3.dp)
                 .clickable(
                     enabled = true,
-                    onClick = goToLoginPage,
+                    onClick = goToSignupPage,
                 )
         )
         if (state.error != "") {
@@ -97,18 +86,16 @@ fun SignupPage(
 
 @Preview(showBackground = true)
 @Composable
-fun SignupPagePreview() {
-    SignupPage(
-        state = SignupScreenUiState.InProgress(
-            email = "email@yahoo.com",
-            password = "myPassword4"
+fun LoginPagePreview() {
+    LoginPage(
+        state = LoginScreenViewData(
+            email = "sdejesus@yahoo.com",
+            password = "12345"
         ),
-        updateUserNameTextField = {},
+        updateEmailTextField = {},
         updatePasswordTextField = {},
-        updatePasswordRepeatTextField = {},
-        goToLoginPage = {},
-        createNewUser = {},
-        modifier = Modifier
-            .fillMaxSize()
+        goToSignupPage = {},
+        login = {},
+        modifier = Modifier.fillMaxSize()
     )
 }

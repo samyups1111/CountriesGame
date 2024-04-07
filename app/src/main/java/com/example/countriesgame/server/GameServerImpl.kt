@@ -4,6 +4,7 @@ import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.User
 import com.example.countriesgame.model.gamescreen.GameStateLabel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 class GameServerImpl @Inject constructor(): GameServer {
@@ -11,36 +12,36 @@ class GameServerImpl @Inject constructor(): GameServer {
     override var gameState : MutableStateFlow<GameState> = MutableStateFlow(GameState())
         private set
     private lateinit var allCountries: List<Country>
-    private lateinit var user1: User
-    private lateinit var user2: User
 
-    override fun setCountries(countries: List<Country>) {
-        allCountries = countries
-    }
+    override fun setCountries(countries: List<Country>) { allCountries = countries }
 
     override fun setPlayers(
         userOne: User,
         userTwo: User,
     ) {
-        user1 = userOne
-        user2 = userTwo
+        gameState.update {
+            it.copy(
+                user1 = userOne,
+                user2 = userTwo,
+            )
+        }
     }
 
     override fun startGame() {
         val startingLetter = allLettersWithCountryInitial.random()
         val countriesRemaining = getCountriesByLetter(startingLetter)
         val lettersRemaining = getAllLettersExcept(startingLetter)
-        val startState = GameState(
-            gameStateLabel = GameStateLabel.GAME_IN_PROGRESS,
-            user1 = user1,
-            user2 = user2,
-            currentLetter = startingLetter,
-            countriesRemaining = countriesRemaining,
-            numOfCountriesLeft = countriesRemaining.size,
-            remainingLetters = lettersRemaining,
-            currentAnswer = "",
-        )
-        gameState.value = startState
+
+        gameState.update {
+            it.copy(
+                gameStateLabel = GameStateLabel.GAME_IN_PROGRESS,
+                currentLetter = startingLetter,
+                countriesRemaining = countriesRemaining,
+                numOfCountriesLeft = countriesRemaining.size,
+                remainingLetters = lettersRemaining,
+                currentAnswer = "",
+            )
+        }
     }
 
     private fun getCountriesByLetter(letter: Char): List<Country> {
@@ -54,31 +55,25 @@ class GameServerImpl @Inject constructor(): GameServer {
     override fun startNextRound() {
         val nextLetter = getNewRandomLetter()
         val countriesRemainingNextRound = getCountriesByLetter(nextLetter)
-        val remainingLettersNextRound = getRemainingLetters(letterToFilter = nextLetter)
-        val currentState = gameState.value
-        val player1 = currentState.user1.copy(countriesGuessedCorrectly = emptyList())
-        val player2 = currentState.user2.copy(countriesGuessedCorrectly = emptyList())
 
-        gameState.value = GameState(
-            gameStateLabel = GameStateLabel.GAME_IN_PROGRESS,
-            user1 = player1,
-            user2 = player2,
-            currentLetter = nextLetter,
-            countriesRemaining = countriesRemainingNextRound,
-            numOfCountriesLeft = countriesRemainingNextRound.size,
-            remainingLetters = remainingLettersNextRound,
-            currentAnswer = "",
-        )
+        gameState.update {
+            it.copy(
+                gameStateLabel = GameStateLabel.GAME_IN_PROGRESS,
+                user1 = it.user1.copy(countriesGuessedCorrectly = emptyList()),
+                user2 = it.user2.copy(countriesGuessedCorrectly = emptyList()),
+                currentLetter = nextLetter,
+                countriesRemaining = countriesRemainingNextRound,
+                numOfCountriesLeft = countriesRemainingNextRound.size,
+                remainingLetters = getRemainingLetters(letterToFilter = nextLetter),
+                currentAnswer = "",
+            )
+        }
     }
 
-    private fun getNewRandomLetter(): Char {
-        val remainingLetters = gameState.value.remainingLetters
-        return remainingLetters.random()
-    }
+    private fun getNewRandomLetter(): Char = gameState.value.remainingLetters.random()
 
     private fun getRemainingLetters(letterToFilter: Char): List<Char> {
-        val remainingLetters = gameState.value.remainingLetters
-        return remainingLetters.filter { it != letterToFilter }
+        return gameState.value.remainingLetters.filter { it != letterToFilter }
     }
 
     override fun onAnswerSubmitted(answer: String) {
@@ -92,7 +87,7 @@ class GameServerImpl @Inject constructor(): GameServer {
     }
 
     private fun updateAnswer(newAnswer: String) {
-        gameState.value = gameState.value.copy(currentAnswer = newAnswer)
+        gameState.update { it.copy(currentAnswer = newAnswer) }
     }
 
     private fun Country.hasName(answer: String): Boolean {
@@ -115,11 +110,7 @@ class GameServerImpl @Inject constructor(): GameServer {
         else roundFinishedInDraw()
     }
 
-    private fun moreCountriesRemainingThisRound(): Boolean {
-        val prevNumOfCountriesRemaining = gameState.value.numOfCountriesLeft
-        val currentNumOfCountriesRemaining = prevNumOfCountriesRemaining - 1
-        return currentNumOfCountriesRemaining > 0
-    }
+    private fun moreCountriesRemainingThisRound(): Boolean = gameState.value.numOfCountriesLeft - 1 > 0
 
     private fun updateRoundInProgressAfterCorrectAnswer(answer: String) {
         val answerCountry = getCountryByName(answer)
@@ -174,24 +165,23 @@ class GameServerImpl @Inject constructor(): GameServer {
     private fun roundFinishedInDraw() {
         val state = gameState.value
 
-        if (isGameOver()) return
-
-        gameState.value = GameState(
-            gameStateLabel = GameStateLabel.BETWEEN_ROUNDS,
-            user1 = state.user1.copy(isRoundWinner = false),
-            user2 = state.user2.copy(isRoundWinner = false),
-            currentLetter = state.currentLetter,
-            countriesRemaining = emptyList(),
-            remainingLetters = state.remainingLetters,
-        )
+        if (isGameOver()) setGameOverState()
+        else
+        gameState.update {
+            it.copy(
+                gameStateLabel = GameStateLabel.BETWEEN_ROUNDS,
+                user1 = state.user1.copy(isRoundWinner = false),
+                user2 = state.user2.copy(isRoundWinner = false),
+                currentLetter = state.currentLetter,
+                countriesRemaining = emptyList(),
+                remainingLetters = state.remainingLetters,
+            )
+        }
     }
 
     private fun isGameOver(): Boolean {
         val remainingLetters = gameState.value.remainingLetters
-        return if (remainingLetters.isEmpty()) {
-            setGameOverState()
-            true
-        } else false
+        return remainingLetters.isEmpty()
     }
 
     private fun setGameOverState() {
@@ -199,7 +189,12 @@ class GameServerImpl @Inject constructor(): GameServer {
         val player1Score = state.user1.score
         val player2Score = state.user2.score
         val winner = if (player1Score < player2Score) state.user2 else state.user1
-        //gameState.value = GameState(winner = winner)
+        gameState.update {
+            it.copy(
+                gameStateLabel = GameStateLabel.GAME_OVER,
+                gameWinner = winner,
+            )
+        }
     }
 
     override fun onGiveUp() {
@@ -216,18 +211,20 @@ class GameServerImpl @Inject constructor(): GameServer {
             isItsTurn = !prevState.user2.isItsTurn,
         )
 
-        if (isGameOver()) return
-
-        gameState.value = GameState(
-            gameStateLabel = GameStateLabel.BETWEEN_ROUNDS,
-            user1 = player1,
-            user2 = player2,
-            currentLetter = prevState.currentLetter,
-            //missedCountries = prevState.countriesRemaining,
-            //numOfMissedCountries = prevState.countriesRemaining.size,
-            remainingLetters = prevState.remainingLetters,
-            //roundWinner = roundWinner,
-        )
+        if (isGameOver()) setGameOverState()
+        else
+        gameState.update {
+            it.copy(
+                gameStateLabel = GameStateLabel.BETWEEN_ROUNDS,
+                user1 = player1,
+                user2 = player2,
+                currentLetter = prevState.currentLetter,
+                countriesRemaining = prevState.countriesRemaining,
+                numOfCountriesLeft = prevState.countriesRemaining.size,
+                remainingLetters = prevState.remainingLetters,
+                //roundWinner = roundWinner,
+            )
+        }
     }
 
     private fun getRoundWinnerAfterGiveUp(): User {

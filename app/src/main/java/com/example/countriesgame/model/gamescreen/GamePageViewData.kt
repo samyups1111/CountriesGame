@@ -10,7 +10,7 @@ data class GamePageViewData(
     val user2: User = User(),
     val currentLetter: Char = ' ',
     val countriesRemaining: List<Country> = emptyList(),
-    val numOfCountriesLeft: Int = 100,
+    val numOfCountriesLeft: Int = 0,
     val player1TurnColor: Color = Color.LightGray,
     val player2TurnColor: Color = Color.LightGray,
     val searchBarText: String = "",
@@ -23,9 +23,9 @@ data class GamePageViewData(
     val gameWinner: String = "",
 )
 
-sealed class GameStateLabel {
-    object LOADING : GameStateLabel()
-    object GAME_IN_PROGRESS : GameStateLabel()
-    object BETWEEN_ROUNDS : GameStateLabel()
-    object GAME_OVER : GameStateLabel()
+enum class GameStateLabel {
+    LOADING,
+    GAME_IN_PROGRESS,
+    BETWEEN_ROUNDS,
+    GAME_OVER,
 }

@@ -8,7 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.countriesgame.sign_in.LoginWithEmailAndPasswordUseCase
 import com.example.countriesgame.sign_in.SignupResult
 import com.example.countriesgame.sign_in.VerifySignupInputFormatUseCase
-import com.example.countriesgame.ui.loginscreen.state.LoginScreenUiState
+import com.example.countriesgame.model.loginscreen.LoginScreenViewData
+import com.example.countriesgame.model.loginscreen.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,21 +20,20 @@ class LoginScreenViewModel @Inject constructor(
     private val loginWithEmailAndPasswordUseCase: LoginWithEmailAndPasswordUseCase,
     ) : ViewModel() {
 
-    var uiState by mutableStateOf<LoginScreenUiState>(LoginScreenUiState.InProgress())
+    var uiState by mutableStateOf(LoginScreenViewData())
         private set
 
     fun verifyInputAndLogin() {
         viewModelScope.launch {
-            val state = uiState as LoginScreenUiState.InProgress
             val formatResult = verifySignupInputFormatUseCase.invoke(
-                email = state.email,
-                password = state.password,
+                email = uiState.email,
+                password = uiState.password,
             )
 
             when (formatResult) {
                 is SignupResult.Success -> { loginToRemote() }
                 is SignupResult.Error -> {
-                    uiState = state.copy(error = formatResult.e)
+                    uiState = uiState.copy(error = formatResult.e)
                 }
             }
         }
@@ -41,28 +41,31 @@ class LoginScreenViewModel @Inject constructor(
 
     private fun loginToRemote() {
         viewModelScope.launch {
-            val state = uiState as LoginScreenUiState.InProgress
-            val loginResult = loginWithEmailAndPasswordUseCase.invoke(email = state.email, password = state.password)
+            val loginResult = loginWithEmailAndPasswordUseCase.invoke(
+                email = uiState.email,
+                password = uiState.password,
+            )
 
-            uiState = when (loginResult) {
-                is SignupResult.Success -> {
-                    LoginScreenUiState.Success
-                }
+            uiState = uiState.copy(
+                state = when (loginResult) {
+                    is SignupResult.Success -> {
+                        LoginState.SUCCESS
+                    }
 
-                is SignupResult.Error -> {
-                    LoginScreenUiState.InProgress(error = loginResult.e)
-                }
-            }
+                    is SignupResult.Error -> {
+                        LoginState.IN_PROGRESS
+                    }
+                },
+                error = if (loginResult is SignupResult.Error) loginResult.e else ""
+            )
         }
     }
 
     fun updateEmailTextField(name: String) {
-        val state = uiState as LoginScreenUiState.InProgress
-        uiState = state.copy(email = name, error = "")
+        uiState = uiState.copy(email = name, error = "")
     }
 
     fun updatePasswordTextField(password: String) {
-        val state = uiState as LoginScreenUiState.InProgress
-        uiState = state.copy(password = password)
+        uiState = uiState.copy(password = password)
     }
 }

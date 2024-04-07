@@ -8,7 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.countriesgame.sign_in.SignupResult
 import com.example.countriesgame.sign_in.SignupWithEmailAndPasswordUseCase
 import com.example.countriesgame.sign_in.VerifySignupInputFormatUseCase
-import com.example.countriesgame.ui.signupscreen.state.SignupScreenUiState
+import com.example.countriesgame.model.loginscreen.SignupScreenViewData
+import com.example.countriesgame.model.loginscreen.SignupState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +20,7 @@ class SignupScreenViewModel @Inject constructor(
     private val signupWithEmailAndPasswordUseCase: SignupWithEmailAndPasswordUseCase,
 ) : ViewModel() {
 
-    var uiState by mutableStateOf<SignupScreenUiState>(SignupScreenUiState.InProgress())
+    var uiState by mutableStateOf(SignupScreenViewData())
         private set
 
     fun signup() {
@@ -27,46 +28,44 @@ class SignupScreenViewModel @Inject constructor(
             when (val formatResult = verifySignupFormatInput()) {
                 is SignupResult.Success -> { createNewUser() }
                 is SignupResult.Error -> {
-                    uiState = (uiState as SignupScreenUiState.InProgress).copy(error = formatResult.e)
+                    uiState = uiState.copy(error = formatResult.e)
                 }
             }
         }
     }
 
     private fun verifySignupFormatInput(): SignupResult {
-        val state = uiState as SignupScreenUiState.InProgress
         return verifySignupInputFormatUseCase.invoke(
-            email = state.email,
-            password = state.password,
-            passwordRepeat = state.passwordRepeat,
+            email = uiState.email,
+            password = uiState.password,
+            passwordRepeat = uiState.passwordRepeat,
         )
     }
 
     private suspend fun createNewUser() {
-        val state = uiState as SignupScreenUiState.InProgress
-        val signupResult = signupWithEmailAndPasswordUseCase.invoke(state.email, state.password)
-        when (signupResult) {
-            is SignupResult.Success -> {
-                uiState = SignupScreenUiState.Success
-            }
-            is SignupResult.Error -> {
-                uiState = (uiState as SignupScreenUiState.InProgress).copy(error = signupResult.e)
-            }
-        }
+        val signupResult = signupWithEmailAndPasswordUseCase.invoke(uiState.email, uiState.password)
+        uiState = uiState.copy(
+            state = when (signupResult) {
+                is SignupResult.Success -> {
+                    SignupState.SUCCESS
+                }
+                is SignupResult.Error -> {
+                    SignupState.IN_PROGRESS
+                }
+            },
+            error = if (signupResult is SignupResult.Error) signupResult.e else ""
+        )
     }
 
     fun updateEmailTextField(name: String) {
-        val state = uiState as SignupScreenUiState.InProgress
-        uiState = state.copy(email = name, error = "")
+        uiState = uiState.copy(email = name, error = "")
     }
 
     fun updatePasswordTextField(password: String) {
-        val state = uiState as SignupScreenUiState.InProgress
-        uiState = state.copy(password = password)
+        uiState = uiState.copy(password = password)
     }
 
     fun updatePasswordRepeatTextField(password: String) {
-        val state = uiState as SignupScreenUiState.InProgress
-        uiState = state.copy(passwordRepeat = password)
+        uiState = uiState.copy(passwordRepeat = password)
     }
 }

@@ -4,8 +4,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.countriesgame.ui.loginscreen.page.LoginPage
-import com.example.countriesgame.ui.loginscreen.state.LoginScreenUiState
+import com.example.countriesgame.model.loginscreen.LoginState
 
 @Composable
 fun LoginScreen(
@@ -14,10 +13,10 @@ fun LoginScreen(
     goToSignupScreen: () -> Unit,
     vm: LoginScreenViewModel = hiltViewModel()
 ) {
-    when (val state = vm.uiState) {
-        is LoginScreenUiState.InProgress -> {
+    when (vm.uiState.state) {
+        LoginState.IN_PROGRESS -> {
             LoginPage(
-                state = state,
+                state = vm.uiState,
                 updateEmailTextField = { email: String -> vm.updateEmailTextField(email) },
                 updatePasswordTextField = { password: String -> vm.updatePasswordTextField(password) },
                 login = { vm.verifyInputAndLogin() },
@@ -25,9 +24,9 @@ fun LoginScreen(
                 modifier = modifier,
             )
         }
-        is LoginScreenUiState.Loading -> {
+        LoginState.LOADING -> {
            Text(text = "Loading...")
         }
-        is LoginScreenUiState.Success -> { goToHome() }
+        LoginState.SUCCESS -> { goToHome() }
     }
 }

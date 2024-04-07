@@ -14,4 +14,5 @@ data class GameState(
     val numOfCountriesLeft: Int = 100,
     val remainingLetters: List<Char> = emptyList(),
     val currentAnswer: String = "",
+    val gameWinner: User = User(),
 )
