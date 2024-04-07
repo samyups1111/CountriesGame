@@ -1,6 +1,4 @@
-package com.example.countriesgame.networking
-
-import com.example.countriesgame.model.usecase.SignupResult
+package com.example.countriesgame.sign_in
 
 interface AuthService {
 

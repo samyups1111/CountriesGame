@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.countriesgame.model.usecase.SignupResult
-import com.example.countriesgame.model.usecase.SignupUseCase
-import com.example.countriesgame.model.usecase.VerifySignupInputFormatUseCase
+import com.example.countriesgame.sign_in.SignupResult
+import com.example.countriesgame.sign_in.SignupWithEmailAndPasswordUseCase
+import com.example.countriesgame.sign_in.VerifySignupInputFormatUseCase
 import com.example.countriesgame.ui.signupscreen.state.SignupScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SignupScreenViewModel @Inject constructor(
     private val verifySignupInputFormatUseCase: VerifySignupInputFormatUseCase,
-    private val signupUseCase: SignupUseCase,
+    private val signupWithEmailAndPasswordUseCase: SignupWithEmailAndPasswordUseCase,
 ) : ViewModel() {
 
     var uiState by mutableStateOf<SignupScreenUiState>(SignupScreenUiState.InProgress())
@@ -44,7 +44,7 @@ class SignupScreenViewModel @Inject constructor(
 
     private suspend fun createNewUser() {
         val state = uiState as SignupScreenUiState.InProgress
-        val signupResult = signupUseCase.invoke(state.email, state.password)
+        val signupResult = signupWithEmailAndPasswordUseCase.invoke(state.email, state.password)
         when (signupResult) {
             is SignupResult.Success -> {
                 uiState = SignupScreenUiState.Success

@@ -1,23 +1,19 @@
 package com.example.countriesgame.ui.gamescreen
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.User
+import com.example.countriesgame.model.gamescreen.CountryBottomSheetViewData
+import com.example.countriesgame.model.gamescreen.GamePageViewData
 import com.example.countriesgame.model.usecase.GetCountriesUseCase
 import com.example.countriesgame.server.GameServer
 import com.example.countriesgame.server.GameState
-import com.example.countriesgame.ui.gamescreen.state.BottomSheetState
-import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,29 +23,26 @@ class GameScreenViewModel @Inject constructor(
     private val gameServer: GameServer,
 ): ViewModel() {
 
-    val gameScreenUiStateFlow: StateFlow<GameScreenUiState> = gameServer.gameState.map { gameState ->
-        gameState.toGameScreenUiState()
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = GameScreenUiState.Loading,
-    )
-    var bottomSheetState by mutableStateOf<BottomSheetState>(BottomSheetState.Hide)
-        private set
+    private val gameState: StateFlow<GameState> = gameServer.gameState
+
+    private val _gamePageUiState = MutableStateFlow(GamePageViewData())
+    val gamePageUiState: StateFlow<GamePageViewData> = _gamePageUiState
 
     private val user1 = User(
-        id = 1,
+        id = "1",
         name = "Player 1",
         score = 0,
         countriesGuessedCorrectly = listOf(),
-        isItsTurn = true
+        isItsTurn = true,
+        email = ""
     )
     private val user2 = User(
-        id = 2,
+        id = "2",
         name = "Player 2",
         score = 0,
         countriesGuessedCorrectly = listOf(),
-        isItsTurn = false
+        isItsTurn = false,
+        email = ""
     )
 
     init {
@@ -62,7 +55,52 @@ class GameScreenViewModel @Inject constructor(
             gameServer.setCountries(countries = allCountries)
             gameServer.setPlayers(userOne = user1, userTwo = user2)
             gameServer.startGame()
+            getGameStateData()
         }
+    }
+
+    private suspend fun getGameStateData() {
+        gameState.collect { game ->
+            _gamePageUiState.update { uiState ->
+                uiState.copy(
+                    state = game.gameStateLabel,
+                    user1 = game.user1,
+                    user2 = game.user2,
+                    currentLetter = game.currentLetter,
+                    numOfCountriesLeft = game.numOfCountriesLeft,
+                    countriesRemaining = game.countriesRemaining,
+                    remainingLetters = game.remainingLetters,
+                    currentAnswer = game.currentAnswer,
+                    searchBarText = game.currentAnswer,
+                    player1TurnColor = getTurnColor(isPlayerTurn = game.user1.isItsTurn),
+                    player2TurnColor = getTurnColor(isPlayerTurn = game.user2.isItsTurn),
+                    resultBackgroundColor = Color.Green,//getResultBackgroundColor(),
+                    resultText = getResultText(game.user1, game.user2),
+                    gameWinner = getGameWinner(user1, user2),
+                )
+            }
+        }
+    }
+
+    private fun getTurnColor(isPlayerTurn: Boolean): Color {
+        return if (isPlayerTurn) Color.Yellow else Color.LightGray
+    }
+
+    private fun getResultBackgroundColor(playerId: String): Color {
+        return if (playerId == "") Color.LightGray else Color.Yellow
+    }
+
+    private fun getResultText(user1: User, user2: User): String {
+        val winner = if (user1.isRoundWinner) user1
+        else if (user2.isRoundWinner) user2
+        else User(name = "Both")
+        return "Result: ${winner.name} Won!"
+    }
+
+    private fun getGameWinner(user1: User, user2: User): String {
+        return if (user1.isGameWinner) user1.name
+        else if (user2.isGameWinner) user2.name
+        else ""
     }
 
     fun onPlayerAnswered(answer: String) { gameServer.onAnswerSubmitted(answer = answer) }
@@ -71,72 +109,26 @@ class GameScreenViewModel @Inject constructor(
 
     fun startNextRound() = gameServer.startNextRound()
 
-    fun hideBottomSheet() { bottomSheetState = BottomSheetState.Hide }
+    fun hideBottomSheet() { _gamePageUiState.update { it.copy(showBottomSheet = false) } }
 
     fun showBottomSheet(country: Country) {
-        bottomSheetState = BottomSheetState.Show(
-            countryName = country.name,
-            capital = country.capital,
-            region = country.region,
-            flag = country.flag,
-            maps = country.maps,
-            population = country.population,
-            unMember = country.unMember,
-            imgUrl = country.coatOfArms.png,
-            languages = country.languages.toString(),
-            currencies = country.currencies.toString(),
-            borders = country.borders.toString(),
+        _gamePageUiState.update { uiState ->
+            uiState.copy(
+                showBottomSheet = true,
+                bottomSheetViewData = CountryBottomSheetViewData(
+                    countryName = country.name,
+                    capital = country.capital,
+                    region = country.region,
+                    flag = country.flag,
+                    maps = country.maps,
+                    population = country.population,
+                    unMember = country.unMember,
+                    imgUrl = country.coatOfArms.png,
+                    languages = country.languages.toString(),
+                    currencies = country.currencies.toString(),
+                    borders = country.borders.toString(),
+                )
             )
-    }
-
-    private fun GameState.toGameScreenUiState(): GameScreenUiState {
-        return when (this) {
-            is GameState.GameOver -> { GameScreenUiState.GameOver(winner = this.winner.name) }
-
-            is GameState.Loading -> { GameScreenUiState.Loading }
-
-            is GameState.RoundInProgress -> {
-                GameScreenUiState.RoundInProgress(
-                    user1 = user1,
-                    user2 = user2,
-                    currentLetter = this.currentLetter,
-                    countriesRemaining = this.countriesRemaining,
-                    numOfCountriesLeft = this.numOfCountriesLeft,
-                    searchBarText = this.currentAnswer,
-                    remainingLetters = this.remainingLetters,
-                    player1TurnColor = getPlayer1TurnColor(isPlayer1Turn = this.user1.isItsTurn),
-                    player2TurnColor = getPlayer2TurnColor(isPlayer2Turn = this.user2.isItsTurn),
-                )
-            }
-
-            is GameState.RoundFinished -> {
-                GameScreenUiState.RoundFinished(
-                    user1 = user1,
-                    user2 = user2,
-                    currentLetter = this.currentLetter,
-                    missedCountries = this.missedCountries,
-                    numOfMissedCountries = this.numOfMissedCountries,
-                    remainingLetters = this.remainingLetters,
-                    resultText = getResultText(winnerName = this.roundWinner.name),
-                    resultBackgroundColor = getResultBackgroundColor(playerId = this.roundWinner.id),
-                )
-            }
         }
-    }
-
-    private fun getPlayer1TurnColor(isPlayer1Turn: Boolean): Color {
-        return if (isPlayer1Turn) Color.Yellow else Color.LightGray
-    }
-
-    private fun getPlayer2TurnColor(isPlayer2Turn: Boolean): Color {
-        return if (isPlayer2Turn) Color.Yellow else Color.LightGray
-    }
-
-    private fun getResultText(winnerName: String): String {
-        return "Result: $winnerName Won!"
-    }
-
-    private fun getResultBackgroundColor(playerId: Int): Color {
-        return if (playerId == 0) Color.LightGray else Color.Yellow
     }
 }

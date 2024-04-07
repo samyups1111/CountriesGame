@@ -36,3 +36,4 @@ sealed class GameScreenUiState {
         val remainingLetters: List<Char> = emptyList(),
     ) : GameScreenUiState()
 }
+

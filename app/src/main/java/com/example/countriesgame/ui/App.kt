@@ -13,7 +13,7 @@ fun App() {
 
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "signup_screen") {
+    NavHost(navController = navController, startDestination = "game_screen") {
 
         composable("signup_screen") {
             SignUpScreen(

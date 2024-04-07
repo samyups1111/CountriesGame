@@ -29,12 +29,12 @@ import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.CountryMap
 import com.example.countriesgame.model.CountryName
 import com.example.countriesgame.model.User
+import com.example.countriesgame.model.gamescreen.GamePageViewData
 import com.example.countriesgame.ui.gamescreen.component.ScoreBoard
-import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 
 @Composable
 fun RoundFinishedPage(
-    roundFinishedState: GameScreenUiState.RoundFinished,
+    roundFinishedState: GamePageViewData,
     showBottomSheet: (Country) -> Unit,
     startNextRound: () -> Unit,
     modifier: Modifier = Modifier,
@@ -64,7 +64,7 @@ fun RoundFinishedPage(
                 )
                 .padding(15.dp)
         )
-        Row() {
+        Row {
             ScoreBoard(
                 name = roundFinishedState.user1.name,
                 turnColor = Color.LightGray,
@@ -83,7 +83,7 @@ fun RoundFinishedPage(
             )
         }
 
-        if (roundFinishedState.missedCountries.isNotEmpty()) {
+        if (roundFinishedState.countriesRemaining.isNotEmpty()) {
             Text(
                 text = "Missed Countries",
                 fontWeight = FontWeight.Bold,
@@ -93,7 +93,7 @@ fun RoundFinishedPage(
                 modifier = Modifier
                     .weight(1F)
             ) {
-                items(roundFinishedState.missedCountries) {country ->
+                items(roundFinishedState.countriesRemaining) {country ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -133,23 +133,23 @@ fun RoundFinishedPage(
 @Composable
 fun RoundFinishedPreview() {
     RoundFinishedPage(
-        roundFinishedState = GameScreenUiState.RoundFinished(
+        roundFinishedState = GamePageViewData(
             user1 = User(
-                id = 0,
+                id = "",
                 name = "sam",
                 score = 3,
                 countriesGuessedCorrectly = emptyList(),
                 isItsTurn = true
             ),
             user2 = User(
-                id = 2,
+                id = "",
                 name = "Angel",
                 score = 1,
                 countriesGuessedCorrectly = emptyList(),
                 isItsTurn = false,
             ),
             currentLetter = 'c',
-            missedCountries = listOf(
+            countriesRemaining = listOf(
                 Country(
                     id = "",
                     name = CountryName("United States", "USA"),

@@ -1,7 +1,7 @@
 package com.example.countriesgame.model.repository
 
-import com.example.countriesgame.model.usecase.SignupResult
-import com.example.countriesgame.networking.AuthService
+import com.example.countriesgame.sign_in.SignupResult
+import com.example.countriesgame.sign_in.AuthService
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(

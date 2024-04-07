@@ -1,6 +1,6 @@
-package com.example.countriesgame.networking
+package com.example.countriesgame.sign_in
 
-import com.example.countriesgame.model.usecase.SignupResult
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineDispatcher
@@ -9,7 +9,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class FirebaseAuthService @Inject constructor(
+class FirebaseAuthClient @Inject constructor(
     private val auth: FirebaseAuth,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ): AuthService {

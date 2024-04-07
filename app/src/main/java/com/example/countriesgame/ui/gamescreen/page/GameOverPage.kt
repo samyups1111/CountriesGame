@@ -7,12 +7,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.countriesgame.model.gamescreen.GamePageViewData
 import com.example.countriesgame.ui.LottieLoader
-import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 
 @Composable
 fun GameOverPage(
-    gameScreenUiState: GameScreenUiState.GameOver,
+    gameScreenUiState: GamePageViewData,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -20,7 +20,7 @@ fun GameOverPage(
             .fillMaxSize(),
     ) {
         Text(
-            text = "Congratulations ${gameScreenUiState.winner}",
+            text = "Congratulations ${gameScreenUiState.gameWinner}",
             modifier = Modifier
                 .fillMaxSize()
                 .align(Alignment.Center)
@@ -35,8 +35,8 @@ fun GameOverPage(
 @Composable
 fun GameOverPagePreview() {
     GameOverPage(
-        gameScreenUiState = GameScreenUiState.GameOver(
-            winner = "Sammy"
+        gameScreenUiState = GamePageViewData(
+            gameWinner = "Sammy"
         ),
     )
 }

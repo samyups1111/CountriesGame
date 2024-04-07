@@ -1,9 +1,8 @@
-package com.example.countriesgame.model.usecase
+package com.example.countriesgame.sign_in
 
-import com.example.countriesgame.networking.AuthService
 import javax.inject.Inject
 
-class LoginUseCase @Inject constructor(
+class LoginWithEmailAndPasswordUseCase @Inject constructor(
     private val auth: AuthService,
 ) {
     suspend fun invoke(email: String, password: String): SignupResult {

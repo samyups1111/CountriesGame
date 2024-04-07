@@ -24,13 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.User
+import com.example.countriesgame.model.gamescreen.GamePageViewData
 import com.example.countriesgame.ui.gamescreen.component.ScoreBoard
-import com.example.countriesgame.ui.gamescreen.state.GameScreenUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RoundInProgressPage(
-    gameScreenUiState: GameScreenUiState.RoundInProgress,
+    gameScreenUiState: GamePageViewData,
     onCountryGuessed: (String) -> Unit,
     showBottomSheet: (Country) -> Unit,
     onGiveUp: () -> Unit,
@@ -105,16 +105,16 @@ fun RoundInProgressPage(
 @Composable
 fun RoundInProgressPreview() {
     RoundInProgressPage(
-        gameScreenUiState = GameScreenUiState.RoundInProgress(
+        gameScreenUiState = GamePageViewData(
             user1 = User(
-                id = 0,
+                id = "",
                 name = "sam",
                 score = 3,
                 countriesGuessedCorrectly = emptyList(),
                 isItsTurn = true
             ),
             user2 = User(
-                id = 2,
+                id = "",
                 name = "Angel",
                 score = 1,
                 countriesGuessedCorrectly = emptyList(),

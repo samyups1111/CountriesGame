@@ -1,4 +1,4 @@
-package com.example.countriesgame.model.usecase
+package com.example.countriesgame.sign_in
 
 import javax.inject.Inject
 

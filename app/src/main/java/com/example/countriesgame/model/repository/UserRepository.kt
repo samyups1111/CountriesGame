@@ -1,6 +1,6 @@
 package com.example.countriesgame.model.repository
 
-import com.example.countriesgame.model.usecase.SignupResult
+import com.example.countriesgame.sign_in.SignupResult
 
 interface UserRepository {
 

@@ -5,11 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.countriesgame.model.usecase.LoginUseCase
-import com.example.countriesgame.model.usecase.SignupResult
-import com.example.countriesgame.model.usecase.VerifySignupInputFormatUseCase
+import com.example.countriesgame.sign_in.LoginWithEmailAndPasswordUseCase
+import com.example.countriesgame.sign_in.SignupResult
+import com.example.countriesgame.sign_in.VerifySignupInputFormatUseCase
 import com.example.countriesgame.ui.loginscreen.state.LoginScreenUiState
-import com.example.countriesgame.ui.signupscreen.state.SignupScreenUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
     private val verifySignupInputFormatUseCase: VerifySignupInputFormatUseCase,
-    private val loginUseCase: LoginUseCase,
+    private val loginWithEmailAndPasswordUseCase: LoginWithEmailAndPasswordUseCase,
     ) : ViewModel() {
 
     var uiState by mutableStateOf<LoginScreenUiState>(LoginScreenUiState.InProgress())
@@ -43,7 +42,7 @@ class LoginScreenViewModel @Inject constructor(
     private fun loginToRemote() {
         viewModelScope.launch {
             val state = uiState as LoginScreenUiState.InProgress
-            val loginResult = loginUseCase.invoke(email = state.email, password = state.password)
+            val loginResult = loginWithEmailAndPasswordUseCase.invoke(email = state.email, password = state.password)
 
             uiState = when (loginResult) {
                 is SignupResult.Success -> {

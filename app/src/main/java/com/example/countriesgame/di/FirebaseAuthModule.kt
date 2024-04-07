@@ -1,7 +1,7 @@
 package com.example.countriesgame.di
 
-import com.example.countriesgame.networking.AuthService
-import com.example.countriesgame.networking.FirebaseAuthService
+import com.example.countriesgame.sign_in.AuthService
+import com.example.countriesgame.sign_in.FirebaseAuthClient
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,6 +15,6 @@ abstract class FirebaseAuthServiceModule {
     @Binds
     @Singleton
     abstract fun bindFirebaseAuthService(
-        auth: FirebaseAuthService,
+        auth: FirebaseAuthClient,
     ): AuthService
 }
