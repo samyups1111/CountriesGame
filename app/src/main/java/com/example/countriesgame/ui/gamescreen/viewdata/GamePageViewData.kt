@@ -1,4 +1,4 @@
-package com.example.countriesgame.model.gamescreen
+package com.example.countriesgame.ui.gamescreen.viewdata
 
 import androidx.compose.ui.graphics.Color
 import com.example.countriesgame.model.Country

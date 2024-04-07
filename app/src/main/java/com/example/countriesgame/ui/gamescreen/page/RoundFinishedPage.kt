@@ -29,8 +29,8 @@ import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.CountryMap
 import com.example.countriesgame.model.CountryName
 import com.example.countriesgame.model.User
-import com.example.countriesgame.model.gamescreen.GamePageViewData
 import com.example.countriesgame.ui.gamescreen.component.ScoreBoard
+import com.example.countriesgame.ui.gamescreen.viewdata.GamePageViewData
 
 @Composable
 fun RoundFinishedPage(

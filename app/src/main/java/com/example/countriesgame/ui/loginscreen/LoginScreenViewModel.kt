@@ -8,8 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.countriesgame.sign_in.LoginWithEmailAndPasswordUseCase
 import com.example.countriesgame.sign_in.SignupResult
 import com.example.countriesgame.sign_in.VerifySignupInputFormatUseCase
-import com.example.countriesgame.model.loginscreen.LoginScreenViewData
-import com.example.countriesgame.model.loginscreen.LoginState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject

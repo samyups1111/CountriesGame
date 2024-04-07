@@ -2,7 +2,7 @@ package com.example.countriesgame.server
 
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.User
-import com.example.countriesgame.model.gamescreen.GameStateLabel
+import com.example.countriesgame.ui.gamescreen.viewdata.GameStateLabel
 
 
 data class GameState(

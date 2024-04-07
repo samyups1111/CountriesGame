@@ -2,7 +2,7 @@ package com.example.countriesgame.server
 
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.User
-import com.example.countriesgame.model.gamescreen.GameStateLabel
+import com.example.countriesgame.ui.gamescreen.viewdata.GameStateLabel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -12,6 +12,11 @@ class GameServerImpl @Inject constructor(): GameServer {
     override var gameState : MutableStateFlow<GameState> = MutableStateFlow(GameState())
         private set
     private lateinit var allCountries: List<Country>
+
+    private val allLettersWithCountryInitial = listOf(
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+        'L','M', 'N', 'O', 'P', 'Q', 'R','S', 'T', 'U', 'V', 'Y', 'Z'
+    )
 
     override fun setCountries(countries: List<Country>) { allCountries = countries }
 
@@ -92,9 +97,7 @@ class GameServerImpl @Inject constructor(): GameServer {
 
     private fun Country.hasName(answer: String): Boolean {
         val answerFormatted = answer.trim()
-        val officialName = this.name.official
-        val commonNames = this.name.common
-        return answerFormatted.equals(officialName, ignoreCase = true) || answerFormatted.inCommonNames(commonNames)
+        return answerFormatted.equals(name.official, ignoreCase = true) || answerFormatted.inCommonNames(name.common)
     }
 
     private fun String.inCommonNames(commonNames: String): Boolean {
@@ -166,16 +169,17 @@ class GameServerImpl @Inject constructor(): GameServer {
         val state = gameState.value
 
         if (isGameOver()) setGameOverState()
-        else
-        gameState.update {
-            it.copy(
-                gameStateLabel = GameStateLabel.BETWEEN_ROUNDS,
-                user1 = state.user1.copy(isRoundWinner = false),
-                user2 = state.user2.copy(isRoundWinner = false),
-                currentLetter = state.currentLetter,
-                countriesRemaining = emptyList(),
-                remainingLetters = state.remainingLetters,
-            )
+        else {
+            gameState.update {
+                it.copy(
+                    gameStateLabel = GameStateLabel.BETWEEN_ROUNDS,
+                    user1 = state.user1.copy(isRoundWinner = false),
+                    user2 = state.user2.copy(isRoundWinner = false),
+                    currentLetter = state.currentLetter,
+                    countriesRemaining = emptyList(),
+                    remainingLetters = state.remainingLetters,
+                )
+            }
         }
     }
 
@@ -235,12 +239,5 @@ class GameServerImpl @Inject constructor(): GameServer {
 
     private fun getUpdatedScore(user: User): Int {
         return if (user.isItsTurn) user.score else user.score + 1
-    }
-
-    companion object {
-        val allLettersWithCountryInitial = listOf(
-            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-            'L','M', 'N', 'O', 'P', 'Q', 'R','S', 'T', 'U', 'V', 'Y', 'Z'
-        )
     }
 }

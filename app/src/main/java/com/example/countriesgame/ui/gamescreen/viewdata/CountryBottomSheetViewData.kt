@@ -1,4 +1,4 @@
-package com.example.countriesgame.model.gamescreen
+package com.example.countriesgame.ui.gamescreen.viewdata
 
 import com.example.countriesgame.model.CountryMap
 import com.example.countriesgame.model.CountryName

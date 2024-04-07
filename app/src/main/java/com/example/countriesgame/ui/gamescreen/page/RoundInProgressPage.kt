@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.User
-import com.example.countriesgame.model.gamescreen.GamePageViewData
 import com.example.countriesgame.ui.gamescreen.component.ScoreBoard
+import com.example.countriesgame.ui.gamescreen.viewdata.GamePageViewData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.countriesgame.model.gamescreen.GamePageViewData
 import com.example.countriesgame.ui.LottieLoader
+import com.example.countriesgame.ui.gamescreen.viewdata.GamePageViewData
 
 @Composable
 fun GameOverPage(

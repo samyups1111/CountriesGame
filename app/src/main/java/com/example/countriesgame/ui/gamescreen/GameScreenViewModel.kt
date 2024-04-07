@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.countriesgame.model.Country
 import com.example.countriesgame.model.User
-import com.example.countriesgame.model.gamescreen.CountryBottomSheetViewData
-import com.example.countriesgame.model.gamescreen.GamePageViewData
+import com.example.countriesgame.ui.gamescreen.viewdata.CountryBottomSheetViewData
+import com.example.countriesgame.ui.gamescreen.viewdata.GamePageViewData
 import com.example.countriesgame.model.usecase.GetCountriesUseCase
 import com.example.countriesgame.server.GameServer
 import com.example.countriesgame.server.GameState

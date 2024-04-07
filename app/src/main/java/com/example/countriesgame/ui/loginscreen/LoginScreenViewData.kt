@@ -1,4 +1,4 @@
-package com.example.countriesgame.model.loginscreen
+package com.example.countriesgame.ui.loginscreen
 
 data class LoginScreenViewData(
     val state: LoginState = LoginState.LOADING,

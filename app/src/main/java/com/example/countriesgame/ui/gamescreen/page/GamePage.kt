@@ -5,9 +5,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.countriesgame.model.Country
-import com.example.countriesgame.model.gamescreen.GamePageViewData
-import com.example.countriesgame.model.gamescreen.GameStateLabel
 import com.example.countriesgame.ui.gamescreen.component.CountryBottomSheet
+import com.example.countriesgame.ui.gamescreen.viewdata.GamePageViewData
+import com.example.countriesgame.ui.gamescreen.viewdata.GameStateLabel
 
 @Composable
 fun GamePage(
